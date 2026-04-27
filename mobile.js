@@ -371,8 +371,18 @@ function displayTripInfo(trip, weather, isEstimated) {
             const day = weather.days[i];
             console.log(`🌡 渲染第${i+1}天: 日期=${day.date}, 最低=${day.tempMin}°, 最高=${day.tempMax}°, 图标=${day.icon}`);
             
-            // 完全复制test-scroll.html的结构（用内联样式）
-            const cardHtml = '<div class="weather-card">' +
+            // 按React组件思路：加scroll-snap
+            const cardHtml = '<div style="' +
+                'min-width: 110px; ' +
+                'flex-shrink: 0; ' +
+                'scroll-snap-align: start; ' +
+                'background: white; ' +
+                'border-radius: 16px; ' +
+                'padding: 20px 12px; ' +
+                'text-align: center; ' +
+                'box-shadow: 0 4px 12px rgba(0,0,0,0.08); ' +
+                'border: 2px solid #f7e8c9;' +
+                '">' +
                 '<div style="font-size: 13px; color: #666; margin-bottom: 10px;">' + formatMonthDay(day.date) + '</div>' +
                 '<div style="font-size: 40px; margin: 12px 0;">' + day.icon + '</div>' +
                 '<div style="font-size: 16px; font-weight: 700; color: #f17172;">' + day.tempMin + '°~' + day.tempMax + '°</div>' +
@@ -390,18 +400,30 @@ function displayTripInfo(trip, weather, isEstimated) {
         weatherHtml = '<div class="weather-loading">天气数据加载中...</div>';
     }
     
-    // 分成两个独立的卡片
-    const headerHtml = `
-        <div class="trip-info-destination">📍 ${trip.destination}</div>
-        <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
-    `;
+    // 按照React组件的思路：外层不滚动，内层滚动
+    const weatherCardsHtml = dayCards.join('');
     
     const fullHtml = `
-        <div style="margin: 20px; padding: 20px; background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
-            ${headerHtml}
-        </div>
         <div style="margin: 20px; padding: 20px; background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden;">
-            ${weatherHtml}
+            <!-- 上层：固定不动 -->
+            <div style="margin-bottom: 12px;">
+                <div style="font-size: 20px; font-weight: 700; color: #f17172; margin-bottom: 6px;">📍 ${trip.destination}</div>
+                <div style="font-size: 14px; color: #666;">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
+            </div>
+            
+            <!-- 下层：只有这里滚动 -->
+            <div style="
+                display: flex;
+                overflow-x: scroll;
+                gap: 12px;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                margin: 0 -20px;
+                padding: 0 20px;
+            ">
+                ${weatherCardsHtml}
+            </div>
         </div>
     `;
     
