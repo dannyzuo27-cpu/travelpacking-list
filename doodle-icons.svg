@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <defs>
+    <!-- Hand-drawn plane icon -->
+    <symbol id="icon-plane" viewBox="0 0 64 64">
+      <path d="M8 32 Q16 28 24 32 L32 16 L40 32 Q48 28 56 32 M32 32 L32 48 M28 44 L32 48 L36 44" 
+            stroke="currentColor" stroke-width="2.5" fill="none" 
+            stroke-linecap="round" stroke-linejoin="round"
+            style="stroke-dasharray: 2 1; filter: url(#rough);"/>
+    </symbol>
+    
+    <!-- Hand-drawn luggage icon -->
+    <symbol id="icon-luggage" viewBox="0 0 64 64">
+      <rect x="16" y="24" width="32" height="28" rx="3" 
+            stroke="currentColor" stroke-width="2.5" fill="none"
+            stroke-linecap="round" style="filter: url(#rough);"/>
+      <path d="M24 24 L24 16 Q24 12 28 12 L36 12 Q40 12 40 16 L40 24" 
+            stroke="currentColor" stroke-width="2.5" fill="none"
+            stroke-linecap="round" style="filter: url(#rough);"/>
+      <circle cx="20" cy="54" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+      <circle cx="44" cy="54" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+      <line x1="24" y1="32" x2="40" y2="32" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+    
+    <!-- Hand-drawn passport icon -->
+    <symbol id="icon-passport" viewBox="0 0 64 64">
+      <rect x="18" y="12" width="28" height="40" rx="2" 
+            stroke="currentColor" stroke-width="2.5" fill="none"
+            stroke-linecap="round" style="filter: url(#rough);"/>
+      <path d="M22 16 L22 48" stroke="currentColor" stroke-width="2.5"/>
+      <circle cx="32" cy="28" r="6" stroke="currentColor" stroke-width="2.5" fill="none"/>
+      <line x1="26" y1="40" x2="38" y2="40" stroke="currentColor" stroke-width="2"/>
+      <line x1="26" y1="44" x2="38" y2="44" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+    
+    <!-- Hand-drawn shirt icon -->
+    <symbol id="icon-shirt" viewBox="0 0 64 64">
+      <path d="M20 20 Q20 16 24 16 L28 16 Q32 16 32 20" 
+            stroke="currentColor" stroke-width="2.5" fill="none"
+            stroke-linecap="round" style="filter: url(#rough);"/>
+      <path d="M32 20 L40 28 M32 20 L24 28" stroke="currentColor" stroke-width="2.5"/>
+      <path d="M24 28 L20 32 L20 52 L44 52 L44 32 L40 28" 
+            stroke="currentColor" stroke-width="2.5" fill="none"
+            stroke-linecap="round" stroke-linejoin="round" style="filter: url(#rough);"/>
+    </symbol>
+    
+    <!-- Hand-drawn phone icon -->
+    <symbol id="icon-phone" viewBox="0 0 64 64">
+      <rect x="22" y="12" width="20" height="40" rx="3" 
+            stroke="currentColor" stroke-width="2.5" fill="none"
+            stroke-linecap="round" style="filter: url(#rough);"/>
+      <rect x="24" y="16" width="16" height="32" rx="1" 
+            stroke="currentColor" stroke-width="1.5" fill="none"/>
+      <path d="M32 44 Q28 48 24 52" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="20" y="50" width="8" height="4" rx="1" stroke="currentColor" stroke-width="2"/>
+    </symbol>
+    
+    <!-- Hand-drawn star -->
+    <symbol id="doodle-star" viewBox="0 0 50 50">
+      <path d="M25 5 L30 18 L44 18 L33 28 L38 42 L25 32 L12 42 L17 28 L6 18 L20 18 Z" 
+            stroke="currentColor" stroke-width="2" fill="none" 
+            stroke-linejoin="round" style="filter: url(#rough);"/>
+    </symbol>
+    
+    <!-- Hand-drawn circle -->
+    <symbol id="doodle-circle" viewBox="0 0 50 50">
+      <circle cx="25" cy="25" r="18" 
+              stroke="currentColor" stroke-width="2" fill="none" 
+              style="filter: url(#rough);"/>
+      <path d="M15 25 L35 25 M25 15 L25 35" 
+            stroke="currentColor" stroke-width="2"/>
+    </symbol>
+    
+    <!-- Hand-drawn arrow -->
+    <symbol id="doodle-arrow" viewBox="0 0 50 50">
+      <path d="M10 25 Q20 23 30 25 Q20 27 10 25" 
+            stroke="currentColor" stroke-width="2" fill="none" 
+            stroke-linecap="round" style="filter: url(#rough);"/>
+      <path d="M30 18 L42 25 L30 32" 
+            stroke="currentColor" stroke-width="2" fill="none" 
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    
+    <!-- Hand-drawn heart -->
+    <symbol id="doodle-heart" viewBox="0 0 50 50">
+      <path d="M25 42 Q10 30 10 20 Q10 10 18 10 Q25 10 25 18 Q25 10 32 10 Q40 10 40 20 Q40 30 25 42" 
+            stroke="currentColor" stroke-width="2" fill="none" 
+            stroke-linejoin="round" style="filter: url(#rough);"/>
+    </symbol>
+    
+    <!-- Hand-drawn squiggle -->
+    <symbol id="doodle-squiggle" viewBox="0 0 100 20">
+      <path d="M5 10 Q15 5 25 10 T45 10 T65 10 T85 10 T95 10" 
+            stroke="currentColor" stroke-width="2" fill="none" 
+            stroke-linecap="round"/>
+    </symbol>
+    
+    <!-- Rough filter for hand-drawn effect -->
+    <filter id="rough">
+      <feTurbulence type="turbulence" baseFrequency="0.05" numOctaves="2" result="turbulence"/>
+      <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="2" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>

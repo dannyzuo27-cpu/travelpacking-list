@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Packing List - Pack Smart, Travel Light</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Include hand-drawn icons -->
+    <div style="display: none;">
+        <object data="doodle-icons.svg" type="image/svg+xml"></object>
+    </div>
+    <div class="phone-frame">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>14:36</span>
+            <button class="lang-switch" onclick="toggleLanguage()">
+                <span id="currentLang">EN</span>
+            </button>
+        </div>
+
+        <!-- Home Page -->
+        <div class="page active" id="home">
+            <div class="home-page">
+                <div class="home-title">
+                    <h1 data-i18n="home.title">Travel Packing</h1>
+                    <p data-i18n="home.subtitle">Pack Smart, Travel Light ✈️</p>
+                </div>
+
+                <div class="card-list">
+                    <!-- Card 1 -->
+                    <div class="glass-card" onclick="goToDetail(0)">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 64 64">
+                                <use href="doodle-icons.svg#icon-luggage" fill="#1A1A1A"/>
+                            </svg>
+                        </div>
+                        <div class="card-title">Tibet 6-Day Trip</div>
+                        <div class="card-meta">May 1-6 · Road Trip 🚗</div>
+                        <div class="card-progress">
+                            <span class="progress-dot filled"></span>
+                            <span class="progress-dot filled"></span>
+                            <span class="progress-dot filled"></span>
+                            <span class="progress-dot filled"></span>
+                            <span class="progress-dot filled"></span>
+                            <span class="progress-dot filled"></span>
+                            <span class="progress-dot"></span>
+                            <span class="progress-dot"></span>
+                        </div>
+                        <div class="card-stats">23 / 50 <span data-i18n="home.packed">Packed</span> · 8.5 / 23 kg</div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="glass-card">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 64 64">
+                                <use href="doodle-icons.svg#icon-plane" fill="#1A1A1A"/>
+                            </svg>
+                        </div>
+                        <div class="card-title">Yunnan 4-Day Tour</div>
+                        <div class="card-meta">Mar 15-18 · Group Tour 🎒</div>
+                        <div class="card-stats completed" data-i18n="home.completed">Completed ✓</div>
+                    </div>
+                </div>
+
+                <button class="new-list-btn" data-i18n="home.create">＋ Create New List</button>
+            </div>
+        </div>
+
+        <!-- Detail Page -->
+        <div class="page" id="detail">
+            <div class="detail-page">
+                <div class="detail-header">
+                    <span class="back-btn" onclick="goToHome()">←</span>
+                    <span class="header-title">Tibet 6-Day Trip</span>
+                    <span class="menu-btn">⋮</span>
+                </div>
+
+                <div class="detail-content">
+                    <!-- Navigation Arrows -->
+                    <div class="nav-arrows">
+                        <div class="nav-arrow" id="prevBtn" onclick="prevCategory()">←</div>
+                        <div class="nav-arrow" id="nextBtn" onclick="nextCategory()">→</div>
+                    </div>
+
+                    <!-- Documents Category -->
+                    <div class="category-card active category-documents" data-index="0">
+                        <div class="category-icon">
+                            <svg viewBox="0 0 64 64">
+                                <use href="doodle-icons.svg#icon-passport" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="category-title" data-i18n="detail.documents">Documents</div>
+                        <div class="category-subtitle">2 / 3 <span data-i18n="detail.ready">Ready</span></div>
+                        <div class="items-list">
+                            <div class="item">
+                                <div class="item-checkbox checked" onclick="toggleCheck(this)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <polyline points="4,12 9,17 20,6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="item-name">ID Card</span>
+                                <div class="item-avatar">Ming</div>
+                            </div>
+                            <div class="item">
+                                <div class="item-checkbox checked" onclick="toggleCheck(this)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <polyline points="4,12 9,17 20,6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="item-name">Passport</span>
+                                <div class="item-avatar">Ming</div>
+                            </div>
+                            <div class="item">
+                                <div class="item-checkbox" onclick="toggleCheck(this)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <polyline points="4,12 9,17 20,6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="item-name">Border Pass</span>
+                                <span class="item-empty">—</span>
+                            </div>
+                        </div>
+                        <div class="category-indicators">
+                            <span class="indicator-dot active"></span>
+                            <span class="indicator-dot"></span>
+                            <span class="indicator-dot"></span>
+                        </div>
+                    </div>
+
+                    <!-- Clothing Category -->
+                    <div class="category-card next category-clothing" data-index="1">
+                        <div class="category-icon">
+                            <svg viewBox="0 0 64 64">
+                                <use href="doodle-icons.svg#icon-shirt" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="category-title" data-i18n="detail.clothing">Clothing</div>
+                        <div class="category-subtitle">1 / 12 <span data-i18n="detail.ready">Ready</span></div>
+                        <div class="items-list">
+                            <div class="item">
+                                <div class="item-checkbox checked" onclick="toggleCheck(this)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <polyline points="4,12 9,17 20,6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="item-name">Jacket</span>
+                                <div class="item-avatar avatar-red">Hong</div>
+                            </div>
+                            <div class="item">
+                                <div class="item-checkbox" onclick="toggleCheck(this)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <polyline points="4,12 9,17 20,6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="item-name">Thermal Underwear</span>
+                                <span class="item-empty">—</span>
+                            </div>
+                            <div class="item">
+                                <div class="item-checkbox" onclick="toggleCheck(this)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <polyline points="4,12 9,17 20,6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="item-name">Down Jacket</span>
+                                <span class="item-empty">—</span>
+                            </div>
+                            <div class="item">
+                                <div class="item-checkbox" onclick="toggleCheck(this)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <polyline points="4,12 9,17 20,6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="item-name">Long Sleeve Shirt</span>
+                                <span class="item-empty">—</span>
+                            </div>
+                        </div>
+                        <div class="category-indicators">
+                            <span class="indicator-dot"></span>
+                            <span class="indicator-dot active"></span>
+                            <span class="indicator-dot"></span>
+                        </div>
+                    </div>
+
+                    <!-- Electronics Category -->
+                    <div class="category-card next category-electronics" data-index="2">
+                        <div class="category-icon">
+                            <svg viewBox="0 0 64 64">
+                                <use href="doodle-icons.svg#icon-phone" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="category-title" data-i18n="detail.electronics">Electronics</div>
+                        <div class="category-subtitle">0 / 8 <span data-i18n="detail.ready">Ready</span></div>
+                        <div class="items-list">
+                            <div class="item">
+                                <div class="item-checkbox" onclick="toggleCheck(this)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <polyline points="4,12 9,17 20,6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="item-name">Phone</span>
+                                <span class="item-empty">—</span>
+                            </div>
+                            <div class="item">
+                                <div class="item-checkbox" onclick="toggleCheck(this)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <polyline points="4,12 9,17 20,6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="item-name">Charger</span>
+                                <span class="item-empty">—</span>
+                            </div>
+                            <div class="item">
+                                <div class="item-checkbox" onclick="toggleCheck(this)">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <polyline points="4,12 9,17 20,6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <span class="item-name">Power Bank</span>
+                                <span class="item-empty">—</span>
+                            </div>
+                        </div>
+                        <div class="category-indicators">
+                            <span class="indicator-dot"></span>
+                            <span class="indicator-dot"></span>
+                            <span class="indicator-dot active"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Progress -->
+                <div class="bottom-progress">
+                    <div class="progress-bar">
+                        <div class="progress-label">
+                            <span data-i18n="detail.progress">Packing Progress</span>
+                            <span id="packProgress">23 / 50</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" id="packBar" style="width: 46%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-label">
+                            <span data-i18n="detail.weight">Luggage Weight</span>
+                            <span id="weightProgress">8.5 / 23 kg</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill weight" id="weightBar" style="width: 37%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="i18n.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
