@@ -290,30 +290,37 @@ function openTrip(tripId) {
 
 // 渲染旅行信息（先显示估算，后台加载真实天气）
 async function renderTripInfo(trip) {
-    console.log('开始渲染天气，trip:', trip);
+    console.log('🌡 开始渲染天气，trip:', trip.destination);
+    
+    // 检查是否有缓存的真实天气
+    if (trip.weather && trip.weather.days && trip.weather.days.length > 0) {
+        console.log('✅ 使用缓存的真实天气');
+        displayTripInfo(trip, trip.weather, false);
+        return;
+    }
     
     // 立即显示估算天气
     const estimatedWeather = getEstimatedWeather(trip.startDate, trip.endDate);
-    console.log('估算天气:', estimatedWeather);
+    console.log('⏳ 显示估算天气（每天不同）');
     displayTripInfo(trip, estimatedWeather, true);
     
     // 后台加载真实天气
-    if (!trip.weather) {
-        console.log('开始加载真实天气...');
-        getWeather(trip.destination, trip.startDate, trip.endDate)
-            .then(weather => {
-                console.log('真实天气加载成功:', weather);
-                saveWeatherToTrip(trip.id, weather);
-                displayTripInfo(trip, weather, false);
-            })
-            .catch(err => {
-                console.log('天气加载失败，使用估算值', err);
-            });
-    } else {
-        // 使用缓存的天气
-        console.log('使用缓存天气:', trip.weather);
-        displayTripInfo(trip, trip.weather, false);
-    }
+    console.log('🔄 开始加载真实天气...');
+    getWeather(trip.destination, trip.startDate, trip.endDate)
+        .then(weather => {
+            console.log('✅ 真实天气加载成功，天数:', weather.days ? weather.days.length : 0);
+            if (weather.days && weather.days.length > 0) {
+                console.log('第1天真实温度:', weather.days[0].tempMin, '-', weather.days[0].tempMax);
+                if (weather.days[1]) {
+                    console.log('第2天真实温度:', weather.days[1].tempMin, '-', weather.days[1].tempMax);
+                }
+            }
+            saveWeatherToTrip(trip.id, weather);
+            displayTripInfo(trip, weather, false);
+        })
+        .catch(err => {
+            console.log('❌ 天气加载失败，继续使用估算值', err);
+        });
 }
 
 // 显示旅行信息
@@ -366,7 +373,7 @@ function displayTripInfo(trip, weather, isEstimated) {
     document.getElementById('tripInfoCard').innerHTML = html;
 }
 
-// 估算天气（根据月份）
+// 估算天气（根据月份，添加每日波动）
 function getEstimatedWeather(startDate, endDate) {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -378,23 +385,33 @@ function getEstimatedWeather(startDate, endDate) {
         date.setDate(date.getDate() + i);
         const month = date.getMonth() + 1;
         
-        let tempMin, tempMax, icon;
+        // 基础温度
+        let baseTempMin, baseTempMax, icon;
         if (month >= 6 && month <= 8) {
-            tempMin = 25; tempMax = 35; icon = '🌤';
+            baseTempMin = 25; baseTempMax = 35; icon = '🌤';
         } else if (month >= 3 && month <= 5) {
-            tempMin = 15; tempMax = 25; icon = '☀️';
+            baseTempMin = 15; baseTempMax = 25; icon = '☀️';
         } else if (month >= 9 && month <= 11) {
-            tempMin = 10; tempMax = 20; icon = '🍂';
+            baseTempMin = 10; baseTempMax = 20; icon = '🍂';
         } else {
-            tempMin = -5; tempMax = 10; icon = '❄️';
+            baseTempMin = -5; baseTempMax = 10; icon = '❄️';
         }
+        
+        // 添加每日波动（±3度随机）
+        const variation = Math.floor(Math.random() * 7) - 3; // -3 到 +3
+        const tempMin = baseTempMin + variation;
+        const tempMax = baseTempMax + variation;
+        
+        // 随机改变天气图标
+        const icons = ['☀️', '⛅', '🌤'];
+        const randomIcon = icons[Math.floor(Math.random() * icons.length)];
         
         days.push({
             date: date.toISOString().split('T')[0],
             tempMin,
             tempMax,
             tempAvg: Math.round((tempMin + tempMax) / 2),
-            icon
+            icon: randomIcon
         });
     }
     
