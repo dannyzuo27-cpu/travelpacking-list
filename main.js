@@ -137,7 +137,8 @@ function loadTrips() {
     const cardsHtml = userTrips.map(trip => {
         const stats = calculateTripStats(trip.id);
         const packPercent = Math.round((stats.packed / stats.total) * 100) || 0;
-        const weightPercent = Math.round((stats.weight / trip.maxWeight) * 100) || 0;
+        const weightPercent = trip.maxWeight === 999 ? 0 : Math.round((stats.weight / trip.maxWeight) * 100) || 0;
+        const weightDisplay = trip.maxWeight === 999 ? `${stats.weight.toFixed(1)}kg` : `${stats.weight.toFixed(1)}/${trip.maxWeight}kg`;
 
         return `
             <div class="trip-card" onclick="openTrip('${trip.id}')">
@@ -156,7 +157,7 @@ function loadTrips() {
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${weightPercent}%"></div>
                         </div>
-                        <span>${stats.weight.toFixed(1)}/${trip.maxWeight}kg</span>
+                        <span>${weightDisplay}</span>
                     </div>
                 </div>
             </div>
@@ -213,7 +214,8 @@ function createTrip() {
 }
 
 function generateInitialItems(tripId, includeMakeup) {
-    const items = [];
+    // 从 localStorage 直接读取所有物品
+    const allItems = JSON.parse(localStorage.getItem('items') || '[]');
     
     categories.forEach(cat => {
         // 如果是化妆品分类且用户不需要，跳过
@@ -221,8 +223,8 @@ function generateInitialItems(tripId, includeMakeup) {
         
         const templates = itemsTemplates[cat.id] || [];
         templates.forEach((template, index) => {
-            items.push({
-                id: 'item_' + Date.now() + '_' + index,
+            allItems.push({
+                id: 'item_' + Date.now() + '_' + index + '_' + Math.random(),
                 tripId,
                 category: cat.id,
                 name: template.name,
@@ -234,7 +236,8 @@ function generateInitialItems(tripId, includeMakeup) {
         });
     });
 
-    saveItemsData(items);
+    // 直接保存到 localStorage
+    localStorage.setItem('items', JSON.stringify(allItems));
 }
 
 function openTrip(tripId) {
@@ -308,21 +311,28 @@ function loadCategoryItems() {
 }
 
 function toggleItem(itemId) {
-    const items = getItemsData();
-    const item = items.find(i => i.id === itemId);
+    // 从 localStorage 直接读取所有物品
+    const allItems = JSON.parse(localStorage.getItem('items') || '[]');
+    const item = allItems.find(i => i.id === itemId);
+    
     if (item) {
         item.packed = !item.packed;
-        saveItemsData(items);
+        // 直接保存到 localStorage
+        localStorage.setItem('items', JSON.stringify(allItems));
+        // 重新加载当前分类
         loadCategoryItems();
     }
 }
 
 function toggleBuy(itemId) {
-    const items = getItemsData();
-    const item = items.find(i => i.id === itemId);
+    // 从 localStorage 直接读取所有物品
+    const allItems = JSON.parse(localStorage.getItem('items') || '[]');
+    const item = allItems.find(i => i.id === itemId);
+    
     if (item) {
         item.needToBuy = !item.needToBuy;
-        saveItemsData(items);
+        // 直接保存到 localStorage
+        localStorage.setItem('items', JSON.stringify(allItems));
     }
 }
 
@@ -347,8 +357,9 @@ function addNewItem() {
         return;
     }
 
-    const items = getItemsData();
-    items.push({
+    // 从 localStorage 直接读取所有物品
+    const allItems = JSON.parse(localStorage.getItem('items') || '[]');
+    allItems.push({
         id: 'item_' + Date.now(),
         tripId: currentTripId,
         category: currentCategory,
@@ -359,7 +370,8 @@ function addNewItem() {
         bought: false
     });
 
-    saveItemsData(items);
+    // 直接保存到 localStorage
+    localStorage.setItem('items', JSON.stringify(allItems));
     hideAddItemDialog();
     loadCategoryItems();
 }
@@ -389,10 +401,11 @@ function updateOverallProgress() {
     const trip = getTripsData().find(t => t.id === currentTripId);
     
     const packPercent = Math.round((stats.packed / stats.total) * 100) || 0;
-    const weightPercent = Math.round((stats.weight / trip.maxWeight) * 100) || 0;
+    const weightPercent = trip.maxWeight === 999 ? 0 : Math.round((stats.weight / trip.maxWeight) * 100) || 0;
+    const weightDisplay = trip.maxWeight === 999 ? `${stats.weight.toFixed(1)} kg` : `${stats.weight.toFixed(1)} / ${trip.maxWeight} kg`;
 
     document.getElementById('totalPackProgress').textContent = `${stats.packed} / ${stats.total} 件`;
-    document.getElementById('totalWeightProgress').textContent = `${stats.weight.toFixed(1)} / ${trip.maxWeight} kg`;
+    document.getElementById('totalWeightProgress').textContent = weightDisplay;
     document.getElementById('totalPackBar').style.width = packPercent + '%';
     document.getElementById('totalWeightBar').style.width = Math.min(weightPercent, 100) + '%';
 
