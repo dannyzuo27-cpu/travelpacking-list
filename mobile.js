@@ -94,20 +94,30 @@ function login() {
     errorEl.textContent = '';
     errorEl.style.display = 'none';
 
+    console.log('🔑 尝试登录:', username);
+    
     const users = JSON.parse(localStorage.getItem('users') || '{}');
-
+    console.log('📋 当前所有用户:', Object.keys(users));
+    
     if (!users[username]) {
+        console.log('❌ 用户不存在:', username);
         errorEl.textContent = '用户名不存在';
         errorEl.style.display = 'block';
         return;
     }
 
-    if (users[username].passwordHash !== hashPassword(password)) {
+    const inputHash = hashPassword(password);
+    const savedHash = users[username].passwordHash;
+    console.log('🔐 密码哈希对比:', { inputHash, savedHash, match: inputHash === savedHash });
+    
+    if (savedHash !== inputHash) {
+        console.log('❌ 密码错误');
         errorEl.textContent = '密码错误';
         errorEl.style.display = 'block';
         return;
     }
 
+    console.log('✅ 登录成功');
     currentUser = username;
     localStorage.setItem('currentUser', username);
     document.getElementById('currentUser').textContent = username;
