@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>滚动测试</title>
+    <style>
+        body {
+            padding: 20px;
+            background: #f7e8c9;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .weather-scroll-container {
+            overflow-x: scroll;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            width: 100%;
+        }
+        .weather-scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+        .weather-cards {
+            display: flex;
+            gap: 12px;
+            padding: 4px 0;
+        }
+        .weather-card {
+            flex-shrink: 0;
+            width: 110px;
+            background: white;
+            border-radius: 16px;
+            padding: 20px 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 2px solid #f7e8c9;
+        }
+        .info {
+            margin: 10px 0;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h2>滚动测试</h2>
+    <p class="info">如果能左右滑动看到所有7张卡片，说明样式是对的</p>
+    
+    <div class="container">
+        <div class="weather-scroll-container">
+            <div class="weather-cards">
+                <div class="weather-card">
+                    <div style="font-size: 13px; color: #666; margin-bottom: 10px;">5/15</div>
+                    <div style="font-size: 40px; margin: 12px 0;">☀️</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #f17172;">12°~22°</div>
+                </div>
+                <div class="weather-card">
+                    <div style="font-size: 13px; color: #666; margin-bottom: 10px;">5/16</div>
+                    <div style="font-size: 40px; margin: 12px 0;">⛅</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #f17172;">12°~21°</div>
+                </div>
+                <div class="weather-card">
+                    <div style="font-size: 13px; color: #666; margin-bottom: 10px;">5/17</div>
+                    <div style="font-size: 40px; margin: 12px 0;">🌧</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #f17172;">11°~24°</div>
+                </div>
+                <div class="weather-card">
+                    <div style="font-size: 13px; color: #666; margin-bottom: 10px;">5/18</div>
+                    <div style="font-size: 40px; margin: 12px 0;">⛅</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #f17172;">13°~28°</div>
+                </div>
+                <div class="weather-card">
+                    <div style="font-size: 13px; color: #666; margin-bottom: 10px;">5/19</div>
+                    <div style="font-size: 40px; margin: 12px 0;">☀️</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #f17172;">16°~25°</div>
+                </div>
+                <div class="weather-card">
+                    <div style="font-size: 13px; color: #666; margin-bottom: 10px;">5/20</div>
+                    <div style="font-size: 40px; margin: 12px 0;">🌤</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #f17172;">14°~23°</div>
+                </div>
+                <div class="weather-card">
+                    <div style="font-size: 13px; color: #666; margin-bottom: 10px;">5/21</div>
+                    <div style="font-size: 40px; margin: 12px 0;">☀️</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #f17172;">15°~26°</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <p class="info">
+        卡片总宽度：7 × (110px + 12px) = 854px<br>
+        容器宽度：大约300-400px<br>
+        所以应该能滚动
+    </p>
+</body>
+</html>
