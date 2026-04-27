@@ -288,9 +288,22 @@ function openTrip(tripId) {
     showPage('detailPage');
 }
 
-// 渲染旅行信息（先显示估算，后台加载真实天气）
+// 渲染旅行信息（同步等待真实天气）
 async function renderTripInfo(trip) {
     console.log('🌡 开始渲染天气，trip:', trip.destination);
+    
+    // 先显示加载状态
+    document.getElementById('tripInfoCard').innerHTML = `
+        <div class="trip-info-header">
+            <div class="trip-info-main">
+                <div class="trip-info-destination">📍 ${trip.destination}</div>
+                <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
+            </div>
+            <div class="trip-info-weather">
+                <div style="font-size: 14px; color: #999;">加载天气中...</div>
+            </div>
+        </div>
+    `;
     
     // 检查是否有缓存的真实天气
     if (trip.weather && trip.weather.days && trip.weather.days.length > 0) {
@@ -299,28 +312,39 @@ async function renderTripInfo(trip) {
         return;
     }
     
-    // 立即显示估算天气
-    const estimatedWeather = getEstimatedWeather(trip.startDate, trip.endDate);
-    console.log('⏳ 显示估算天气（每天不同）');
-    displayTripInfo(trip, estimatedWeather, true);
-    
-    // 后台加载真实天气
-    console.log('🔄 开始加载真实天气...');
-    getWeather(trip.destination, trip.startDate, trip.endDate)
-        .then(weather => {
-            console.log('✅ 真实天气加载成功，天数:', weather.days ? weather.days.length : 0);
-            if (weather.days && weather.days.length > 0) {
-                console.log('第1天真实温度:', weather.days[0].tempMin, '-', weather.days[0].tempMax);
-                if (weather.days[1]) {
-                    console.log('第2天真实温度:', weather.days[1].tempMin, '-', weather.days[1].tempMax);
-                }
+    // 同步等待真实天气加载
+    try {
+        console.log('🔄 开始加载真实天气...');
+        const weather = await getWeather(trip.destination, trip.startDate, trip.endDate);
+        
+        console.log('✅ 真实天气加载成功，天数:', weather.days ? weather.days.length : 0);
+        if (weather.days && weather.days.length > 0) {
+            console.log('第1天真实温度:', weather.days[0].tempMin, '-', weather.days[0].tempMax);
+            if (weather.days[1]) {
+                console.log('第2天真实温度:', weather.days[1].tempMin, '-', weather.days[1].tempMax);
             }
-            saveWeatherToTrip(trip.id, weather);
-            displayTripInfo(trip, weather, false);
-        })
-        .catch(err => {
-            console.log('❌ 天气加载失败，继续使用估算值', err);
-        });
+            if (weather.days[2]) {
+                console.log('第3天真实温度:', weather.days[2].tempMin, '-', weather.days[2].tempMax);
+            }
+        }
+        
+        saveWeatherToTrip(trip.id, weather);
+        displayTripInfo(trip, weather, false);
+    } catch (err) {
+        console.log('❌ 天气加载失败:', err);
+        // 加载失败就显示基本信息，不显示天气
+        document.getElementById('tripInfoCard').innerHTML = `
+            <div class="trip-info-header">
+                <div class="trip-info-main">
+                    <div class="trip-info-destination">📍 ${trip.destination}</div>
+                    <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
+                </div>
+                <div class="trip-info-weather">
+                    <div style="font-size: 13px; color: #999;">天气加载失败</div>
+                </div>
+            </div>
+        `;
+    }
 }
 
 // 显示旅行信息
