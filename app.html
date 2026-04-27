@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅行清单 - 智能打包助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background-color: #a4b9dd;
+            min-height: 100vh;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 登录注册页面 */
+        .auth-container {
+            max-width: 450px;
+            margin: 100px auto;
+            background: white;
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .auth-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #8a5128;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: #fbf6e0;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 16px;
+            background: #fbf6e0;
+            color: #8a5128;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-switch {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .auth-switch a {
+            color: #8a5128;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .auth-error {
+            color: #ef4444;
+            font-size: 14px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        /* 顶部导航 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 48px;
+            padding: 24px 32px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #8a5128;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .username {
+            color: #8a5128;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: white;
+            color: #8a5128;
+            border: 2px solid #fbf6e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #fbf6e0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: #fbf6e0;
+            color: #8a5128;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 页面切换 */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* 首页卡片 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .trip-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-top: 4px solid #fbf6e0;
+        }
+
+        .trip-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .trip-card:nth-child(2n) {
+            border-top-color: #e4c291;
+        }
+
+        .trip-card:nth-child(3n) {
+            border-top-color: #8a5128;
+        }
+
+        .trip-card-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #8a5128;
+            margin-bottom: 12px;
+        }
+
+        .trip-card-meta {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .trip-card-progress {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 16px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #fbf6e0;
+            transition: width 0.3s ease;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+        }
+
+        .empty-state-text {
+            font-size: 18px;
+            margin-bottom: 32px;
+        }
+
+        /* 创建表单 */
+        .create-form {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #8a5128;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #8a5128;
+            margin-bottom: 12px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #fbf6e0;
+        }
+
+        .form-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .option-btn {
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            color: #8a5128;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            border-color: #fbf6e0;
+            background: #fefdfb;
+        }
+
+        .option-btn.selected {
+            background: #fbf6e0;
+            color: #8a5128;
+            border-color: #fbf6e0;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 18px;
+            background: #fbf6e0;
+            color: #8a5128;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 详情页 */
+        .detail-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+        }
+
+        .categories-sidebar {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            height: fit-content;
+            position: sticky;
+            top: 24px;
+        }
+
+        .category-nav-item {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #8a5128;
+            font-weight: 600;
+        }
+
+        .category-nav-item:hover {
+            background: #f5f5f5;
+        }
+
+        .category-nav-item.active {
+            background: #fbf6e0;
+            color: #8a5128;
+        }
+
+        .category-badge {
+            background: rgba(164, 185, 221, 0.3);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .detail-content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .detail-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #8a5128;
+        }
+
+        .add-item-btn {
+            padding: 10px 20px;
+            background: #fbf6e0;
+            color: #8a5128;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-item-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .items-table {
+            width: 100%;
+        }
+
+        .items-table thead {
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .items-table th {
+            padding: 16px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .items-table td {
+            padding: 20px 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .items-table tr:hover {
+            background: #fefdfb;
+        }
+
+        .item-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #fbf6e0;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #8a5128;
+        }
+
+        .item-weight {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .item-status {
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .item-status.packed {
+            background: #fbf6e0;
+            color: #8a5128;
+        }
+
+        .item-status.pending {
+            background: #e4c291;
+            color: #8a5128;
+        }
+
+        /* 对话框 */
+        .dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog-overlay.active {
+            display: flex;
+        }
+
+        .dialog-box {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .dialog-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #8a5128;
+            margin-bottom: 24px;
+        }
+
+        .dialog-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+
+        .dialog-input:focus {
+            outline: none;
+            border-color: #fbf6e0;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .dialog-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-btn.primary {
+            background: #fbf6e0;
+            color: #8a5128;
+        }
+
+        .dialog-btn.secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .dialog-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 底部统计 */
+        .bottom-stats {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 2px solid #f0f0f0;
+            padding: 24px 40px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+            display: none;
+            gap: 48px;
+            justify-content: center;
+        }
+
+        .bottom-stats.active {
+            display: flex;
+        }
+
+        .stat-progress {
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .stat-progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #8a5128;
+        }
+
+        .stat-progress-bar {
+            height: 12px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .stat-progress-fill {
+            height: 100%;
+            background: #fbf6e0;
+            transition: width 0.4s ease;
+        }
+
+        .stat-progress-fill.weight {
+            background: #e4c291;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 登录页面 -->
+        <div class="page active" id="loginPage">
+            <div class="auth-container">
+                <div class="auth-title">登录</div>
+                <div class="auth-error" id="loginError"></div>
+                <input type="text" class="auth-input" id="loginUsername" placeholder="用户名">
+                <input type="password" class="auth-input" id="loginPassword" placeholder="密码">
+                <button class="auth-btn" onclick="login()">登录</button>
+                <div class="auth-switch">
+                    还没有账号？<a onclick="showPage('registerPage')">立即注册</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 注册页面 -->
+        <div class="page" id="registerPage">
+            <div class="auth-container">
+                <div class="auth-title">注册</div>
+                <div class="auth-error" id="registerError"></div>
+                <input type="text" class="auth-input" id="registerUsername" placeholder="用户名（4-20个字符）">
+                <input type="password" class="auth-input" id="registerPassword" placeholder="密码（至少6个字符）">
+                <input type="password" class="auth-input" id="registerConfirm" placeholder="确认密码">
+                <button class="auth-btn" onclick="register()">注册</button>
+                <div class="auth-switch">
+                    已有账号？<a onclick="showPage('loginPage')">立即登录</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 首页 -->
+        <div class="page" id="homePage">
+            <div class="header">
+                <div class="logo">🧳 旅行清单</div>
+                <div class="user-info">
+                    <span class="username" id="currentUser"></span>
+                    <button class="logout-btn" onclick="logout()">退出登录</button>
+                    <button class="nav-btn" onclick="showPage('createPage')">＋ 创建新清单</button>
+                </div>
+            </div>
+
+            <div id="tripsContainer"></div>
+        </div>
+
+        <!-- 创建页面 -->
+        <div class="page" id="createPage">
+            <div class="header">
+                <div class="logo">🧳 旅行清单</div>
+                <button class="nav-btn" onclick="showPage('homePage')">← 返回</button>
+            </div>
+
+            <div class="create-form">
+                <div class="form-title">创建新的旅行清单</div>
+                
+                <div class="form-group">
+                    <label class="form-label">清单标题</label>
+                    <input type="text" class="form-input" id="tripTitle" placeholder="例如：西藏6日游">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">目的地</label>
+                    <input type="text" class="form-input" id="tripDestination" placeholder="输入目的地">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">出发日期</label>
+                    <input type="date" class="form-input" id="tripStartDate">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">返回日期</label>
+                    <input type="date" class="form-input" id="tripEndDate">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">旅行类型</label>
+                    <div class="form-options" id="tripTypeOptions">
+                        <button class="option-btn" data-value="vacation">度假休闲</button>
+                        <button class="option-btn" data-value="self_drive">自驾游</button>
+                        <button class="option-btn" data-value="hiking">徒步</button>
+                        <button class="option-btn" data-value="skiing">滑雪</button>
+                        <button class="option-btn" data-value="camping">露营</button>
+                        <button class="option-btn" data-value="business">商务出差</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">行李限制</label>
+                    <div class="form-options" id="luggageOptions">
+                        <button class="option-btn" data-value="7">廉航 (7kg)</button>
+                        <button class="option-btn" data-value="23">经济舱 (23kg)</button>
+                        <button class="option-btn" data-value="999">无限制</button>
+                    </div>
+                </div>
+
+                <button class="form-submit" onclick="createTrip()">生成清单</button>
+            </div>
+        </div>
+
+        <!-- 详情页 -->
+        <div class="page" id="detailPage">
+            <div class="header">
+                <div class="logo">🧳 <span id="detailTripTitle"></span></div>
+                <button class="nav-btn" onclick="showPage('homePage')">← 返回</button>
+            </div>
+
+            <div class="detail-container">
+                <div class="categories-sidebar" id="categoriesList"></div>
+                <div class="detail-content">
+                    <div class="detail-header">
+                        <div class="detail-title" id="categoryTitle"></div>
+                        <button class="add-item-btn" onclick="showAddItemDialog()">＋ 添加物品</button>
+                    </div>
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;"></th>
+                                <th>物品名称</th>
+                                <th>重量</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加物品对话框 -->
+    <div class="dialog-overlay" id="addItemDialog">
+        <div class="dialog-box">
+            <div class="dialog-title">添加新物品</div>
+            <input type="text" class="dialog-input" id="newItemName" placeholder="物品名称">
+            <input type="number" class="dialog-input" id="newItemWeight" placeholder="重量(kg)" step="0.01">
+            <div class="dialog-buttons">
+                <button class="dialog-btn secondary" onclick="hideAddItemDialog()">取消</button>
+                <button class="dialog-btn primary" onclick="addNewItem()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部统计 -->
+    <div class="bottom-stats" id="bottomStats">
+        <div class="stat-progress">
+            <div class="stat-progress-label">
+                <span>打包进度</span>
+                <span id="totalPackProgress">0 / 0 件</span>
+            </div>
+            <div class="stat-progress-bar">
+                <div class="stat-progress-fill" id="totalPackBar"></div>
+            </div>
+        </div>
+        <div class="stat-progress">
+            <div class="stat-progress-label">
+                <span>行李重量</span>
+                <span id="totalWeightProgress">0 / 0 kg</span>
+            </div>
+            <div class="stat-progress-bar">
+                <div class="stat-progress-fill weight" id="totalWeightBar"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
