@@ -390,17 +390,22 @@ function displayTripInfo(trip, weather, isEstimated) {
         weatherHtml = '<div class="weather-loading">天气数据加载中...</div>';
     }
     
-    const html = `
-        <div class="trip-info-header">
-            <div class="trip-info-destination">📍 ${trip.destination}</div>
-            <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
+    // 分成两个独立的卡片
+    const headerHtml = `
+        <div class="trip-info-destination">📍 ${trip.destination}</div>
+        <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
+    `;
+    
+    const fullHtml = `
+        <div style="margin: 20px; padding: 20px; background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+            ${headerHtml}
         </div>
-        <div style="width: 100%; position: relative; z-index: 1;">
+        <div style="margin: 20px; padding: 20px; background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden;">
             ${weatherHtml}
         </div>
     `;
     
-    document.getElementById('tripInfoCard').innerHTML = html;
+    document.getElementById('tripInfoCard').innerHTML = fullHtml;
 }
 
 // 估算天气（根据月份，添加每日波动）
