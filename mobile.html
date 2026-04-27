@@ -910,8 +910,6 @@
         }
 
         .weather-scroll-container::-webkit-scrollbar {
-            display: none;
-        }
 
         .weather-cards {
             display: flex;
@@ -921,33 +919,43 @@
 
         .weather-card {
             flex-shrink: 0;
-            width: 100px;
-            background: linear-gradient(135deg, #a4ceb7, #cee9dc);
-            border-radius: 12px;
-            padding: 16px 12px;
+            width: 110px;
+            background: white;
+            border-radius: 16px;
+            padding: 20px 12px;
             text-align: center;
-            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 2px solid #f7e8c9;
         }
 
         .weather-card-date {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 8px;
-            font-weight: 500;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
         }
 
         .weather-card-icon {
-            font-size: 32px;
-            margin: 8px 0;
+            font-size: 40px;
+            margin: 12px 0;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
 
         .weather-card-temp {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
-            margin-top: 8px;
+            color: #f17172;
+            margin-top: 10px;
+        }
+            display: none;
         }
 
-        .weather-loading {
+        .weather-cards {
+            display: flex;
+            gap: 12px;
+            padding: 4px 0;
+        }
+
             text-align: center;
             padding: 20px;
             color: #999;
@@ -1271,8 +1279,6 @@
         }
 
         .weather-scroll-container::-webkit-scrollbar {
-            display: none;
-        }
 
         .weather-cards {
             display: flex;
@@ -1282,13 +1288,43 @@
 
         .weather-card {
             flex-shrink: 0;
-            width: 100px;
-            background: linear-gradient(135deg, #a4ceb7, #cee9dc);
-            border-radius: 12px;
-            padding: 16px 12px;
+            width: 110px;
+            background: white;
+            border-radius: 16px;
+            padding: 20px 12px;
             text-align: center;
-            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 2px solid #f7e8c9;
         }
+
+        .weather-card-date {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .weather-card-icon {
+            font-size: 40px;
+            margin: 12px 0;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .weather-card-temp {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f17172;
+            margin-top: 10px;
+        }
+            display: none;
+        }
+
+        .weather-cards {
+            display: flex;
+            gap: 12px;
+            padding: 4px 0;
+        }
+
 
         .weather-card-date {
             font-size: 12px;
