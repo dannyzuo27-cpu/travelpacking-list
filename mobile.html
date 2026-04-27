@@ -897,27 +897,23 @@
 
 
         /* 天气卡片 - 横向滑动 */
+
+
         .weather-scroll-container {
             overflow-x: scroll;
             overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
-            -ms-overflow-style: none;
-            margin-top: 12px;
             width: 100%;
         }
-
         .weather-scroll-container::-webkit-scrollbar {
             display: none;
         }
-
         .weather-cards {
             display: flex;
             gap: 12px;
             padding: 4px 0;
-            min-width: max-content;
         }
-
         .weather-card {
             flex-shrink: 0;
             width: 110px;
@@ -928,27 +924,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             border: 2px solid #f7e8c9;
         }
-
-        .weather-card-date {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .weather-card-icon {
-            font-size: 40px;
-            margin: 12px 0;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-        }
-
-        .weather-card-temp {
-            font-size: 16px;
-            font-weight: 700;
-            color: #f17172;
-            margin-top: 10px;
-        }
-
     </style>
 </head>
 <body>
