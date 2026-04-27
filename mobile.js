@@ -319,29 +319,36 @@ async function renderTripInfo(trip) {
 // 显示旅行信息
 function displayTripInfo(trip, weather, isEstimated) {
     console.log('========== 显示天气 ==========');
-    console.log('weather对象:', weather);
+    console.log('weather对象:', JSON.stringify(weather));
     console.log('weather.days:', weather.days);
     console.log('days是数组吗?', Array.isArray(weather.days));
-    console.log('days长度:', weather.days?.length);
-    console.log('第一天数据:', weather.days?.[0]);
+    console.log('days长度:', weather.days ? weather.days.length : 'undefined');
     
     const estimatedTag = isEstimated ? '<span style="font-size: 10px; color: #999;"> (估算)</span>' : '';
     
     let weatherHtml;
-    if (weather.days && Array.isArray(weather.days) && weather.days.length > 0) {
-        console.log('使用多天天气显示');
-        weatherHtml = weather.days.map(day => {
-            console.log('渲染日期:', day.date, day.tempMin, day.tempMax, day.icon);
-            return `
-                <div class="weather-day">
-                    <span class="weather-day-date">${formatMonthDay(day.date)} ${day.icon}</span>
-                    <span class="weather-day-temp">${day.tempMin}°-${day.tempMax}°</span>
-                </div>
-            `;
-        }).join('');
+    
+    // 强制检查 days 是否存在且有内容
+    if (weather && weather.days && weather.days.length > 0) {
+        console.log('✅ 使用多天天气显示，天数:', weather.days.length);
+        
+        // 手动构建HTML，避免箭头函数兼容性问题
+        const dayElements = [];
+        for (let i = 0; i < weather.days.length; i++) {
+            const day = weather.days[i];
+            console.log(`第${i+1}天:`, day.date, day.tempMin, day.tempMax, day.icon);
+            
+            const dayHtml = '<div class="weather-day" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 6px 0; border-bottom: 1px solid #f0f0f0;">' +
+                '<span class="weather-day-date" style="font-weight: 600;">' + formatMonthDay(day.date) + ' ' + day.icon + '</span>' +
+                '<span class="weather-day-temp" style="color: #c09f7e; font-weight: 700; font-size: 15px;">' + day.tempMin + '°-' + day.tempMax + '°</span>' +
+                '</div>';
+            
+            dayElements.push(dayHtml);
+        }
+        weatherHtml = dayElements.join('');
     } else {
-        console.log('使用单温度显示');
-        weatherHtml = `<div class="trip-info-temp">${weather.tempAvg}°${estimatedTag}</div>`;
+        console.log('❌ 使用单温度显示');
+        weatherHtml = '<div class="trip-info-temp">' + weather.tempAvg + '°' + estimatedTag + '</div>';
     }
     
     const html = `
