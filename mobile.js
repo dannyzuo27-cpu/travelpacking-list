@@ -381,6 +381,9 @@ function displayTripInfo(trip, weather, isEstimated) {
         }
         weatherHtml = '<div class="weather-scroll-container"><div class="weather-cards">' + dayCards.join('') + '</div></div>';
         console.log('====== 天气卡片HTML拼接完成 ======');
+        console.log('🔢 生成了', dayCards.length, '张卡片');
+        console.log('📏 卡片总宽度约:', dayCards.length * 122, 'px (110px + 12px gap)');
+        console.log('如果卡片总宽度小于屏幕宽度，就滑不动');
     } else {
         console.log('❌ 使用加载提示');
         weatherHtml = '<div class="weather-loading">天气数据加载中...</div>';
