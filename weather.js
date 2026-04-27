@@ -65,18 +65,16 @@ async function getWeather(destination, startDate, endDate) {
             return getDefaultWeatherMultiDay(startDate, endDate);
         }
 
-        // 判断日期是否太远（超过14天使用去年数据）
+        // 判断日期范围，决定用哪个API
         const start = new Date(startDate);
         const end = new Date(endDate);
         const today = new Date();
         const daysFromNow = Math.floor((start - today) / (1000 * 60 * 60 * 24));
         
-        let queryStartDate = startDate;
-        let queryEndDate = endDate;
-        let isHistorical = false;
+        let queryStartDate, queryEndDate, url, isHistorical = false;
         
-        if (daysFromNow > 14) {
-            // 使用去年同期数据
+        if (daysFromNow < -2) {
+            // 历史日期：使用去年同期数据
             const lastYearStart = new Date(start);
             lastYearStart.setFullYear(lastYearStart.getFullYear() - 1);
             queryStartDate = lastYearStart.toISOString().split('T')[0];
@@ -85,13 +83,25 @@ async function getWeather(destination, startDate, endDate) {
             lastYearEnd.setFullYear(lastYearEnd.getFullYear() - 1);
             queryEndDate = lastYearEnd.toISOString().split('T')[0];
             
+            url = `https://archive-api.open-meteo.com/v1/archive?latitude=${coords.lat}&longitude=${coords.lon}&start_date=${queryStartDate}&end_date=${queryEndDate}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
             isHistorical = true;
+        } else if (daysFromNow > 16) {
+            // 太远的未来：使用去年同期数据
+            const lastYearStart = new Date(start);
+            lastYearStart.setFullYear(lastYearStart.getFullYear() - 1);
+            queryStartDate = lastYearStart.toISOString().split('T')[0];
+            
+            const lastYearEnd = new Date(end);
+            lastYearEnd.setFullYear(lastYearEnd.getFullYear() - 1);
+            queryEndDate = lastYearEnd.toISOString().split('T')[0];
+            
+            url = `https://archive-api.open-meteo.com/v1/archive?latitude=${coords.lat}&longitude=${coords.lon}&start_date=${queryStartDate}&end_date=${queryEndDate}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
+            isHistorical = true;
+        } else {
+            // 近期：使用预报API
+            url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
+            // 不指定日期范围，获取所有可用的预报
         }
-
-        // 调用 API
-        const url = isHistorical
-            ? `https://archive-api.open-meteo.com/v1/archive?latitude=${coords.lat}&longitude=${coords.lon}&start_date=${queryStartDate}&end_date=${queryEndDate}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`
-            : `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&start_date=${startDate}&end_date=${endDate}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
 
         const response = await fetch(url);
         const data = await response.json();
@@ -102,15 +112,26 @@ async function getWeather(destination, startDate, endDate) {
 
         // 解析多天天气数据
         const days = [];
-        const length = Math.min(data.daily.time.length, 7); // 最多显示7天
+        
+        // 如果是预报API，需要找到匹配日期的数据
+        let startIndex = 0;
+        if (!isHistorical) {
+            startIndex = data.daily.time.findIndex(d => d >= startDate);
+            if (startIndex === -1) startIndex = 0;
+        }
+        
+        // 计算需要的天数
+        const tripDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        const length = Math.min(tripDays, data.daily.time.length - startIndex, 7);
         
         for (let i = 0; i < length; i++) {
-            const tempMax = Math.round(data.daily.temperature_2m_max[i]);
-            const tempMin = Math.round(data.daily.temperature_2m_min[i]);
-            const weatherCode = data.daily.weathercode[i];
+            const index = startIndex + i;
+            const tempMax = Math.round(data.daily.temperature_2m_max[index]);
+            const tempMin = Math.round(data.daily.temperature_2m_min[index]);
+            const weatherCode = data.daily.weathercode[index];
             
             days.push({
-                date: data.daily.time[i],
+                date: data.daily.time[index],
                 tempMax,
                 tempMin,
                 tempAvg: Math.round((tempMax + tempMin) / 2),
