@@ -302,9 +302,11 @@ async function renderTripInfo(trip) {
 
 // 显示旅行信息
 function displayTripInfo(trip, weather, isEstimated) {
+    console.log('显示天气:', weather, 'days:', weather.days);
+    
     const estimatedTag = isEstimated ? '<span style="font-size: 10px; color: #999;"> (估算)</span>' : '';
     
-    const weatherHtml = weather.days ? weather.days.map(day => `
+    const weatherHtml = weather.days && weather.days.length > 0 ? weather.days.map(day => `
         <div class="weather-day">
             <span class="weather-day-date">${formatMonthDay(day.date)} ${day.icon}</span>
             <span class="weather-day-temp">${day.tempMin}°-${day.tempMax}°</span>
