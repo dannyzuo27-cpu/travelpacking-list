@@ -16,7 +16,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-            background: linear-gradient(135deg, #96c1dd 0%, #a7b408 100%);
+            background: linear-gradient(135deg, #f8e473 0%, #ffb40f 50%, #e41e71 100%);
             min-height: 100vh;
             padding-bottom: 80px;
         }
@@ -42,13 +42,14 @@
             color: white;
             text-align: center;
             margin-bottom: 40px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .auth-card {
             background: white;
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 32px 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
         }
 
         .auth-input {
@@ -59,17 +60,19 @@
             font-size: 16px;
             margin-bottom: 16px;
             transition: all 0.3s ease;
+            background: #fafafa;
         }
 
         .auth-input:focus {
             outline: none;
             border-color: #ffb40f;
-            background: #fffef8;
+            background: white;
+            box-shadow: 0 4px 12px rgba(255, 180, 15, 0.1);
         }
 
         .auth-btn {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
             color: white;
             border: none;
@@ -77,11 +80,13 @@
             font-size: 18px;
             font-weight: 700;
             margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(255, 180, 15, 0.3);
+            box-shadow: 0 8px 20px rgba(255, 180, 15, 0.3);
+            transition: all 0.2s ease;
         }
 
         .auth-btn:active {
-            transform: scale(0.98);
+            transform: translateY(2px);
+            box-shadow: 0 4px 12px rgba(255, 180, 15, 0.3);
         }
 
         .auth-switch {
@@ -97,13 +102,15 @@
         }
 
         .auth-error {
-            color: #ef4444;
+            color: #e41e71;
             font-size: 14px;
             margin-bottom: 16px;
             text-align: center;
-            padding: 8px;
-            background: #fee;
-            border-radius: 8px;
+            padding: 12px;
+            background: linear-gradient(135deg, #fff8f0 0%, #ffe8e8 100%);
+            border: 2px solid #ff9191;
+            border-radius: 10px;
+            font-weight: 500;
         }
 
         /* 页面切换 */
