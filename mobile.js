@@ -371,10 +371,11 @@ function displayTripInfo(trip, weather, isEstimated) {
             const day = weather.days[i];
             console.log(`🌡 渲染第${i+1}天: 日期=${day.date}, 最低=${day.tempMin}°, 最高=${day.tempMax}°, 图标=${day.icon}`);
             
+            // 完全复制test-scroll.html的结构（用内联样式）
             const cardHtml = '<div class="weather-card">' +
-                '<div class="weather-card-date">' + formatMonthDay(day.date) + '</div>' +
-                '<div class="weather-card-icon">' + day.icon + '</div>' +
-                '<div class="weather-card-temp">' + day.tempMin + '°~' + day.tempMax + '°</div>' +
+                '<div style="font-size: 13px; color: #666; margin-bottom: 10px;">' + formatMonthDay(day.date) + '</div>' +
+                '<div style="font-size: 40px; margin: 12px 0;">' + day.icon + '</div>' +
+                '<div style="font-size: 16px; font-weight: 700; color: #f17172;">' + day.tempMin + '°~' + day.tempMax + '°</div>' +
                 '</div>';
             
             dayCards.push(cardHtml);
