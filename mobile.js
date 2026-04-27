@@ -362,40 +362,36 @@ function displayTripInfo(trip, weather, isEstimated) {
     
     // 强制检查 days 是否存在且有内容
     if (weather && weather.days && weather.days.length > 0) {
-        console.log('====== 开始渲染多天天气 ======');
+        console.log('====== 开始渲染多天天气（卡片式）======');
         console.log('总天数:', weather.days.length);
         
-        // 手动构建HTML，避免箭头函数兼容性问题
-        const dayElements = [];
+        // 构建卡片HTML
+        const dayCards = [];
         for (let i = 0; i < weather.days.length; i++) {
             const day = weather.days[i];
             console.log(`🌡 渲染第${i+1}天: 日期=${day.date}, 最低=${day.tempMin}°, 最高=${day.tempMax}°, 图标=${day.icon}`);
             
-            const dayHtml = '<div class="weather-day" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 6px 0; border-bottom: 1px solid #f0f0f0;">' +
-                '<span class="weather-day-date" style="font-weight: 600;">' + formatMonthDay(day.date) + ' ' + day.icon + '</span>' +
-                '<span class="weather-day-temp" style="color: #c09f7e; font-weight: 700; font-size: 15px;">' + day.tempMin + '°-' + day.tempMax + '°</span>' +
+            const cardHtml = '<div class="weather-card">' +
+                '<div class="weather-card-date">' + formatMonthDay(day.date) + '</div>' +
+                '<div class="weather-card-icon">' + day.icon + '</div>' +
+                '<div class="weather-card-temp">' + day.tempMin + '°~' + day.tempMax + '°</div>' +
                 '</div>';
             
-            dayElements.push(dayHtml);
-            console.log(`✅ HTML已生成: ${dayHtml.substring(0, 100)}...`);
+            dayCards.push(cardHtml);
         }
-        weatherHtml = dayElements.join('');
-        console.log('====== 天气HTML拼接完成 ======');
+        weatherHtml = '<div class="weather-scroll-container"><div class="weather-cards">' + dayCards.join('') + '</div></div>';
+        console.log('====== 天气卡片HTML拼接完成 ======');
     } else {
-        console.log('❌ 使用单温度显示');
-        weatherHtml = '<div class="trip-info-temp">' + weather.tempAvg + '°' + estimatedTag + '</div>';
+        console.log('❌ 使用加载提示');
+        weatherHtml = '<div class="weather-loading">天气数据加载中...</div>';
     }
     
     const html = `
         <div class="trip-info-header">
-            <div class="trip-info-main">
-                <div class="trip-info-destination">📍 ${trip.destination}</div>
-                <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
-            </div>
-            <div class="trip-info-weather">
-                ${weatherHtml}
-            </div>
+            <div class="trip-info-destination">📍 ${trip.destination}</div>
+            <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
         </div>
+        ${weatherHtml}
     `;
     
     document.getElementById('tripInfoCard').innerHTML = html;
