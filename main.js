@@ -110,6 +110,10 @@ function showPage(pageId) {
     } else {
         document.getElementById('bottomStats').classList.remove('active');
     }
+
+    if (pageId === 'shoppingPage') {
+        loadShoppingList();
+    }
 }
 
 // ===== 清单管理 =====
@@ -364,10 +368,11 @@ function addNewItem() {
 
 function calculateTripStats(tripId) {
     const items = getItemsData().filter(i => i.tripId === tripId);
+    const packedItems = items.filter(i => i.packed);
     return {
         total: items.length,
-        packed: items.filter(i => i.packed).length,
-        weight: items.reduce((sum, i) => sum + i.weight, 0)
+        packed: packedItems.length,
+        weight: packedItems.reduce((sum, i) => sum + i.weight, 0) // 只计算已打包物品的重量
     };
 }
 
@@ -405,11 +410,24 @@ function saveTripsData(trips) {
 }
 
 function getItemsData() {
-    return JSON.parse(localStorage.getItem('items') || '[]');
+    const userId = currentUser || localStorage.getItem('currentUser');
+    const allItems = JSON.parse(localStorage.getItem('items') || '[]');
+    // 返回当前用户的物品
+    const userTrips = getTripsData().filter(t => t.userId === userId).map(t => t.id);
+    return allItems.filter(item => userTrips.includes(item.tripId));
 }
 
 function saveItemsData(items) {
-    localStorage.setItem('items', JSON.stringify(items));
+    const allItems = JSON.parse(localStorage.getItem('items') || '[]');
+    const userId = currentUser || localStorage.getItem('currentUser');
+    const userTrips = getTripsData().filter(t => t.userId === userId).map(t => t.id);
+    
+    // 移除当前用户的旧数据
+    const otherUsersItems = allItems.filter(item => !userTrips.includes(item.tripId));
+    
+    // 合并新数据
+    const newAllItems = [...otherUsersItems, ...items];
+    localStorage.setItem('items', JSON.stringify(newAllItems));
 }
 
 // ===== 辅助函数 =====
@@ -440,6 +458,70 @@ document.getElementById('addItemDialog').addEventListener('click', function(e) {
         hideAddItemDialog();
     }
 });
+
+// ===== 购物清单 =====
+
+function loadShoppingList() {
+    const trips = getTripsData().filter(t => t.userId === currentUser);
+    const allItems = getItemsData();
+    
+    // 按清单分组待购买物品
+    const shoppingByTrip = {};
+    
+    trips.forEach(trip => {
+        const toBuyItems = allItems.filter(item => 
+            item.tripId === trip.id && item.needToBuy && !item.bought
+        );
+        if (toBuyItems.length > 0) {
+            shoppingByTrip[trip.id] = {
+                trip: trip,
+                items: toBuyItems
+            };
+        }
+    });
+
+    const container = document.getElementById('shoppingListContainer');
+    
+    if (Object.keys(shoppingByTrip).length === 0) {
+        container.innerHTML = `
+            <div class="shopping-empty">
+                <div style="font-size: 48px; margin-bottom: 16px;">🛍️</div>
+                <div style="font-size: 18px;">暂无待购买物品</div>
+                <div style="font-size: 14px; margin-top: 8px;">在清单详情页勾选"待购买"即可添加</div>
+            </div>
+        `;
+        return;
+    }
+
+    const html = Object.values(shoppingByTrip).map(group => `
+        <div class="shopping-group">
+            <div class="shopping-group-title">
+                <span>✈️ ${group.trip.title}</span>
+                <span style="font-size: 14px; color: #999; font-weight: 400;">${group.items.length} 件</span>
+            </div>
+            ${group.items.map(item => `
+                <div class="shopping-item">
+                    <input type="checkbox" class="shopping-item-checkbox" onchange="markAsBought('${item.id}')">
+                    <div class="shopping-item-name">${item.name}</div>
+                    <div class="shopping-item-trip">${(item.weight * 1000).toFixed(0)}g</div>
+                </div>
+            `).join('')}
+        </div>
+    `).join('');
+
+    container.innerHTML = html;
+}
+
+function markAsBought(itemId) {
+    const items = JSON.parse(localStorage.getItem('items') || '[]');
+    const item = items.find(i => i.id === itemId);
+    if (item) {
+        item.bought = true;
+        item.needToBuy = false;
+        localStorage.setItem('items', JSON.stringify(items));
+        loadShoppingList();
+    }
+}
 
 // ===== 初始化 =====
 

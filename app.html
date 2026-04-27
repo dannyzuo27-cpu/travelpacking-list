@@ -525,6 +525,63 @@
             font-weight: 600;
         }
 
+        .shopping-group {
+            margin-bottom: 32px;
+        }
+
+        .shopping-group-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e41e71;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .shopping-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .shopping-item:hover {
+            border-color: #ffb40f;
+            transform: translateX(4px);
+        }
+
+        .shopping-item-checkbox {
+            width: 24px;
+            height: 24px;
+            margin-right: 16px;
+            cursor: pointer;
+            accent-color: #ffb40f;
+        }
+
+        .shopping-item-name {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .shopping-item-trip {
+            font-size: 14px;
+            color: #666;
+            margin-right: 16px;
+        }
+
+        .shopping-empty {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
         /* 对话框 */
         .dialog-overlay {
             display: none;
@@ -692,6 +749,7 @@
                 <div class="user-info">
                     <span class="username" id="currentUser"></span>
                     <button class="logout-btn" onclick="logout()">退出登录</button>
+                    <button class="nav-btn" onclick="showPage('shoppingPage')">🛒 购物清单</button>
                     <button class="nav-btn" onclick="showPage('createPage')">＋ 创建新清单</button>
                 </div>
             </div>
@@ -759,6 +817,19 @@
                 </div>
 
                 <button class="form-submit" onclick="createTrip()">生成清单</button>
+            </div>
+        </div>
+
+        <!-- 购物清单页 -->
+        <div class="page" id="shoppingPage">
+            <div class="header">
+                <div class="logo">🛒 购物清单</div>
+                <button class="nav-btn" onclick="showPage('homePage')">← 返回</button>
+            </div>
+
+            <div class="create-form">
+                <div class="form-title">待购买物品</div>
+                <div id="shoppingListContainer"></div>
             </div>
         </div>
 
