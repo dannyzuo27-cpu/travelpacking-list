@@ -258,6 +258,9 @@ function openTrip(tripId) {
     // 渲染旅行信息卡片
     renderTripInfo(trip);
     
+    // 加载协作信息
+    loadMembersList();
+    
     renderCategories();
     currentCategory = 'documents';
     loadCategoryItems();
@@ -514,10 +517,12 @@ function markAsBought(itemId) {
     }
 }
 
-// 生成初始物品
+// 生成初始物品（含目的地特殊物品）
 function generateInitialItems(tripId, includeMakeup) {
     const allItems = JSON.parse(localStorage.getItem('items') || '[]');
+    const trip = getTripsData().find(t => t.id === tripId);
     
+    // 基础物品
     categories.forEach(cat => {
         if (cat.id === 'makeup' && !includeMakeup) return;
         
@@ -536,7 +541,35 @@ function generateInitialItems(tripId, includeMakeup) {
         });
     });
 
+    // 目的地特殊物品
+    if (trip && trip.destination) {
+        addDestinationSpecialItems(allItems, tripId, trip.destination);
+    }
+
     localStorage.setItem('items', JSON.stringify(allItems));
+}
+
+// 根据目的地添加特殊物品
+function addDestinationSpecialItems(allItems, tripId, destination) {
+    for (const [keywords, config] of Object.entries(destinationSpecialItems)) {
+        const regex = new RegExp(keywords);
+        if (regex.test(destination)) {
+            config.items.forEach((item, index) => {
+                allItems.push({
+                    id: 'item_special_' + Date.now() + '_' + index + '_' + Math.random(),
+                    tripId,
+                    category: item.category,
+                    name: item.name,
+                    weight: item.weight,
+                    packed: false,
+                    needToBuy: false,
+                    bought: false,
+                    isSpecial: true
+                });
+            });
+            break; // 只匹配第一个规则
+        }
+    }
 }
 
 // 计算清单统计
@@ -595,6 +628,183 @@ document.addEventListener('click', function(e) {
 document.getElementById('addItemDialog').addEventListener('click', function(e) {
     if (e.target === this) {
         hideAddItemDialog();
+    }
+});
+
+// ===== 协作功能 =====
+
+function showCollabDialog() {
+    document.getElementById('collabDialog').classList.add('active');
+    loadCollabInfo();
+}
+
+function hideCollabDialog() {
+    document.getElementById('collabDialog').classList.remove('active');
+}
+
+function loadCollabInfo() {
+    // 生成邀请码
+    const code = generateInviteCode(currentTripId);
+    document.getElementById('inviteCode').textContent = code;
+    
+    // 加载成员列表
+    loadMembersList();
+}
+
+function generateInviteCode(tripId) {
+    // 简单的邀请码生成（实际应该用服务器生成）
+    const hash = tripId.split('_')[1];
+    return hash ? hash.substring(0, 6).toUpperCase() : 'ABC123';
+}
+
+function joinCollab() {
+    const code = document.getElementById('joinCode').value.trim().toUpperCase();
+    
+    if (!code || code.length !== 6) {
+        alert('请输入6位邀请码');
+        return;
+    }
+
+    // 查找对应的清单
+    const trips = getTripsData();
+    const targetTrip = trips.find(t => generateInviteCode(t.id) === code);
+    
+    if (!targetTrip) {
+        alert('邀请码无效或清单不存在');
+        return;
+    }
+
+    // 添加协作关系
+    addCollabMember(targetTrip.id, currentUser);
+    
+    alert('加入成功！');
+    hideCollabDialog();
+    
+    // 重新加载清单列表
+    showPage('homePage');
+    loadTrips();
+}
+
+function addCollabMember(tripId, username) {
+    const collabs = JSON.parse(localStorage.getItem('collaborations') || '{}');
+    
+    if (!collabs[tripId]) {
+        collabs[tripId] = { members: [] };
+    }
+    
+    if (!collabs[tripId].members.includes(username)) {
+        collabs[tripId].members.push(username);
+        localStorage.setItem('collaborations', JSON.stringify(collabs));
+    }
+}
+
+function getCollabMembers(tripId) {
+    const collabs = JSON.parse(localStorage.getItem('collaborations') || '{}');
+    const trip = getTripsData().find(t => t.id === tripId);
+    
+    const members = [trip.userId]; // 创建者
+    if (collabs[tripId]) {
+        members.push(...collabs[tripId].members.filter(m => m !== trip.userId));
+    }
+    
+    return [...new Set(members)];
+}
+
+function loadMembersList() {
+    const members = getCollabMembers(currentTripId);
+    const trip = getTripsData().find(t => t.id === currentTripId);
+    
+    document.getElementById('memberCount').textContent = members.length;
+    
+    const html = members.map(username => {
+        const isOwner = username === trip.userId;
+        const avatar = username.charAt(0).toUpperCase();
+        
+        return `
+            <div class="member-item">
+                <div class="member-avatar">${avatar}</div>
+                <div class="member-name">${username}</div>
+                <div class="member-role">${isOwner ? '创建者' : '协作者'}</div>
+            </div>
+        `;
+    }).join('');
+    
+    document.getElementById('membersList').innerHTML = html;
+    
+    // 更新协作横幅
+    if (members.length > 1) {
+        document.getElementById('collabBanner').style.display = 'flex';
+        document.getElementById('collabMembers').textContent = `与 ${members.length - 1} 人协作`;
+    } else {
+        document.getElementById('collabBanner').style.display = 'none';
+    }
+}
+
+// 修改 loadTrips 以包含协作清单
+function loadTrips() {
+    const trips = getTripsData();
+    const collabs = JSON.parse(localStorage.getItem('collaborations') || '{}');
+    
+    // 自己创建的清单 + 协作的清单
+    const myTrips = trips.filter(t => t.userId === currentUser);
+    const collabTrips = trips.filter(t => {
+        const members = collabs[t.id]?.members || [];
+        return members.includes(currentUser) && t.userId !== currentUser;
+    });
+    
+    const allTrips = [...myTrips, ...collabTrips];
+    const container = document.getElementById('tripList');
+
+    if (allTrips.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🎒</div>
+                <div class="empty-text">还没有旅行清单<br>创建第一个吧！</div>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = allTrips.map(trip => {
+        const stats = calculateTripStats(trip.id);
+        const packPercent = Math.round((stats.packed / stats.total) * 100) || 0;
+        const weightPercent = trip.maxWeight === 999 ? 0 : Math.round((stats.weight / trip.maxWeight) * 100) || 0;
+        const weightDisplay = trip.maxWeight === 999 ? `${stats.weight.toFixed(1)}kg` : `${stats.weight.toFixed(1)}/${trip.maxWeight}kg`;
+        
+        const isCollab = trip.userId !== currentUser;
+        const collabTag = isCollab ? '<div style="display: inline-block; background: #a4ceb7; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">协作</div>' : '';
+
+        return `
+            <div class="trip-card" onclick="openTrip('${trip.id}')">
+                <div class="trip-card-title">${trip.title}${collabTag}</div>
+                <div class="trip-card-meta">${trip.startDate} - ${trip.endDate} · ${getTripTypeLabel(trip.type)}</div>
+                <div class="trip-progress">
+                    <div class="trip-progress-label">
+                        <span>打包进度</span>
+                        <span>${stats.packed}/${stats.total}</span>
+                    </div>
+                    <div class="trip-progress-bar">
+                        <div class="trip-progress-fill" style="width: ${packPercent}%"></div>
+                    </div>
+                </div>
+                <div class="trip-progress">
+                    <div class="trip-progress-label">
+                        <span>行李重量</span>
+                        <span>${weightDisplay}</span>
+                    </div>
+                    <div class="trip-progress-bar">
+                        <div class="trip-progress-fill weight" style="width: ${weightPercent}%"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// 对话框关闭事件
+document.getElementById('collabDialog').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideCollabDialog();
     }
 });
 

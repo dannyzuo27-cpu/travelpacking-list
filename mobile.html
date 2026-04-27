@@ -721,6 +721,103 @@
             font-size: 13px;
             color: #999;
         }
+
+        /* 协作功能 */
+        .collab-banner {
+            margin: 20px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #cee9dc 0%, #a4ceb7 100%);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .collab-info {
+            flex: 1;
+        }
+
+        .collab-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .collab-members {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .collab-btn {
+            padding: 8px 16px;
+            background: white;
+            color: #a4ceb7;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .collab-dialog {
+            padding: 24px;
+        }
+
+        .invite-code {
+            background: #f5f5f5;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .invite-code-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f17172;
+            letter-spacing: 4px;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .members-list {
+            margin-top: 16px;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .member-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #a4ceb7, #cee9dc);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            margin-right: 12px;
+        }
+
+        .member-name {
+            flex: 1;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .member-role {
+            font-size: 12px;
+            color: #999;
+            padding: 4px 8px;
+            background: white;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -847,10 +944,17 @@
         <div class="header">
             <button class="header-btn secondary" onclick="showPage('homePage')">← 返回</button>
             <div class="header-title" id="detailTitle"></div>
-            <div style="width: 48px;"></div>
+            <button class="header-btn" onclick="showCollabDialog()">👥</button>
         </div>
 
         <div class="trip-info-card" id="tripInfoCard"></div>
+        <div class="collab-banner" id="collabBanner" style="display: none;">
+            <div class="collab-info">
+                <div class="collab-title">👥 多人协作中</div>
+                <div class="collab-members" id="collabMembers">与 1 人协作</div>
+            </div>
+            <button class="collab-btn" onclick="showCollabDialog()">管理</button>
+        </div>
 
         <div class="categories-nav" id="categoriesNav"></div>
 
@@ -905,6 +1009,38 @@
             <div class="dialog-buttons">
                 <button class="dialog-btn secondary" onclick="hideAddItemDialog()">取消</button>
                 <button class="dialog-btn primary" onclick="addNewItem()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 协作对话框 -->
+    <div class="dialog-overlay" id="collabDialog">
+        <div class="dialog-box">
+            <div class="dialog-title">多人协作</div>
+            
+            <div class="collab-dialog">
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 8px;">邀请码</div>
+                    <div class="invite-code">
+                        <div class="invite-code-text" id="inviteCode">加载中...</div>
+                    </div>
+                    <div style="font-size: 13px; color: #999; text-align: center;">分享此邀请码给同行的人</div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 8px;">或输入邀请码加入</div>
+                    <input type="text" class="dialog-input" id="joinCode" placeholder="输入6位邀请码">
+                    <button class="dialog-btn primary" style="width: 100%;" onclick="joinCollab()">加入协作</button>
+                </div>
+
+                <div class="members-list">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 12px;">协作成员 (<span id="memberCount">1</span>)</div>
+                    <div id="membersList"></div>
+                </div>
+            </div>
+
+            <div class="dialog-buttons" style="margin-top: 20px;">
+                <button class="dialog-btn secondary" onclick="hideCollabDialog()">关闭</button>
             </div>
         </div>
     </div>
