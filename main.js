@@ -39,20 +39,43 @@ function register() {
         return;
     }
 
+    // 读取现有用户
     const users = JSON.parse(localStorage.getItem('users') || '{}');
 
-    if (users[username]) {
-        errorEl.textContent = '用户名已存在';
+    // 严格检查用户名是否已存在（不区分大小写）
+    const existingUsernames = Object.keys(users).map(u => u.toLowerCase());
+    if (existingUsernames.includes(username.toLowerCase())) {
+        errorEl.textContent = '用户名已存在，请换一个';
         return;
     }
 
+    // 保存新用户
     users[username] = { 
         passwordHash: hashPassword(password), 
         createdAt: new Date().toISOString() 
     };
+    
+    // 保存到 localStorage
     localStorage.setItem('users', JSON.stringify(users));
+    
+    // 立即验证是否保存成功
+    const savedUsers = JSON.parse(localStorage.getItem('users') || '{}');
+    if (!savedUsers[username]) {
+        errorEl.textContent = '注册失败，请重试';
+        console.error('Failed to save user to localStorage');
+        return;
+    }
 
-    alert('注册成功！');
+    console.log('✅ 注册成功:', username);
+    console.log('当前所有用户:', Object.keys(savedUsers));
+    
+    alert('注册成功！请登录');
+    
+    // 清空表单
+    document.getElementById('registerUsername').value = '';
+    document.getElementById('registerPassword').value = '';
+    document.getElementById('registerConfirm').value = '';
+    
     showPage('loginPage');
 }
 

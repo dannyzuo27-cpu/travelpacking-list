@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>清理测试数据 - 旅行清单</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #96c1dd 0%, #a7b408 100%);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 48px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            color: #e41e71;
+            margin-bottom: 16px;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        button.secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+        #result {
+            margin-top: 24px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: left;
+            display: none;
+        }
+        #result.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 清理测试数据</h1>
+        <div class="warning">
+            ⚠️ <strong>警告：</strong>此操作将清空所有账户、清单和物品数据！<br>
+            清空后需要重新注册账号。
+        </div>
+        <button onclick="clearAll()">清空所有数据</button>
+        <button class="secondary" onclick="window.location.href='app.html'">返回桌面版</button>
+        <button class="secondary" onclick="window.location.href='mobile.html'">返回手机版</button>
+        <pre id="result"></pre>
+    </div>
+
+    <script>
+        function clearAll() {
+            if (!confirm('确定要清空所有数据吗？此操作不可恢复！')) {
+                return;
+            }
+            
+            const beforeData = {
+                users: Object.keys(JSON.parse(localStorage.getItem('users') || '{}')),
+                trips: JSON.parse(localStorage.getItem('trips') || '[]').length,
+                items: JSON.parse(localStorage.getItem('items') || '[]').length
+            };
+            
+            localStorage.clear();
+            
+            const result = document.getElementById('result');
+            result.textContent = `✅ 数据已清空！
+
+清理前统计：
+- 用户账号：${beforeData.users.length} 个 (${beforeData.users.join(', ')})
+- 旅行清单：${beforeData.trips} 个
+- 物品记录：${beforeData.items} 条
+
+请刷新页面重新注册。`;
+            result.classList.add('show');
+        }
+    </script>
+</body>
+</html>
