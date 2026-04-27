@@ -1,5 +1,36 @@
 // 目的地特殊物品配置
 const destinationSpecialItems = {
+    "国际|出国|国外|日本|韩国|泰国|美国|英国|法国|德国|意大利|西班牙|澳洲|新西兰|加拿大|新加坡|马来西亚|越南|柬埔寨|印尼|菲律宾|缅甸|老挝": {
+        category: "international",
+        items: [
+            { name: "护照", weight: 0.1, category: "documents" },
+            { name: "签证", weight: 0.01, category: "documents" },
+            { name: "外币", weight: 0.05, category: "documents" },
+            { name: "机票确认单", weight: 0.01, category: "documents" },
+            { name: "酒店确认单", weight: 0.01, category: "documents" },
+            { name: "保险单", weight: 0.01, category: "documents" },
+            { name: "转换插头", weight: 0.1, category: "electronics" }
+        ]
+    },
+    "自驾|开车": {
+        category: "driving",
+        items: [
+            { name: "驾驶证", weight: 0.05, category: "documents" },
+            { name: "行驶证", weight: 0.05, category: "documents" }
+        ]
+    },
+    "学生|校园|大学": {
+        category: "student",
+        items: [
+            { name: "学生证", weight: 0.01, category: "documents" }
+        ]
+    },
+    "边境|西藏|新疆|珠峰|拉萨": {
+        category: "border",
+        items: [
+            { name: "边防证", weight: 0.05, category: "documents" }
+        ]
+    },
     "海边|海南|三亚|巴厘岛|普吉岛|马尔代夫|冲绳": {
         category: "beach",
         items: [
@@ -71,25 +102,12 @@ const destinationSpecialItems = {
     }
 };
 
-// 物品模板库（基础款）
+// 物品模板库（精简基础款）
 const itemsTemplates = {
     "documents": [
         { name: "身份证", weight: 0.05 },
-        { name: "护照", weight: 0.1 },
-        { name: "边防证", weight: 0.05 },
-        { name: "驾驶证", weight: 0.05 },
-        { name: "行驶证", weight: 0.05 },
         { name: "银行卡", weight: 0.01 },
-        { name: "信用卡", weight: 0.01 },
-        { name: "学生证", weight: 0.01 },
-        { name: "现金", weight: 0.05 },
-        { name: "外币", weight: 0.05 },
-        { name: "机票确认单", weight: 0.01 },
-        { name: "酒店确认单", weight: 0.01 },
-        { name: "保险单", weight: 0.01 },
-        { name: "照片（2寸）", weight: 0.01 },
-        { name: "笔", weight: 0.01 },
-        { name: "小本子", weight: 0.05 }
+        { name: "现金", weight: 0.05 }
     ],
     "clothing": [
         { name: "内衣", weight: 0.05 },
@@ -117,118 +135,25 @@ const itemsTemplates = {
         { name: "手机", weight: 0.2 },
         { name: "手机充电器", weight: 0.1 },
         { name: "充电宝", weight: 0.3 },
-        { name: "充电宝线", weight: 0.05 },
-        { name: "手机数据线", weight: 0.05 },
-        { name: "备用数据线", weight: 0.05 },
-        { name: "耳机", weight: 0.05 },
-        { name: "耳机盒", weight: 0.03 },
-        { name: "相机", weight: 0.5 },
-        { name: "相机充电器", weight: 0.1 },
-        { name: "相机电池", weight: 0.1 },
-        { name: "SD卡", weight: 0.01 },
-        { name: "读卡器", weight: 0.02 },
-        { name: "自拍杆", weight: 0.2 },
-        { name: "三脚架", weight: 0.3 },
-        { name: "转换插头", weight: 0.1 },
-        { name: "插线板", weight: 0.3 },
-        { name: "笔记本电脑", weight: 1.5 },
-        { name: "电脑充电器", weight: 0.3 },
-        { name: "鼠标", weight: 0.1 },
-        { name: "iPad", weight: 0.5 },
-        { name: "iPad充电器", weight: 0.1 },
-        { name: "Apple Pencil", weight: 0.02 },
-        { name: "手表", weight: 0.05 },
-        { name: "手表充电器", weight: 0.05 },
-        { name: "Kindle", weight: 0.2 },
-        { name: "Kindle充电线", weight: 0.05 },
-        { name: "蓝牙音箱", weight: 0.3 },
-        { name: "吹风机", weight: 0.5 },
-        { name: "卷发棒", weight: 0.3 },
-        { name: "直板夹", weight: 0.3 },
-        { name: "剃须刀", weight: 0.2 },
-        { name: "剃须刀充电器", weight: 0.05 },
-        { name: "电动牙刷", weight: 0.15 },
-        { name: "电动牙刷充电器", weight: 0.05 }
+        { name: "数据线", weight: 0.05 },
+        { name: "耳机", weight: 0.05 }
     ],
     "medicine": [
         { name: "感冒药", weight: 0.05 },
-        { name: "退烧药", weight: 0.05 },
-        { name: "止痛药", weight: 0.03 },
         { name: "止泻药", weight: 0.05 },
-        { name: "肠胃药", weight: 0.05 },
-        { name: "晕车药", weight: 0.03 },
-        { name: "抗过敏药", weight: 0.03 },
-        { name: "消炎药", weight: 0.05 },
         { name: "创可贴", weight: 0.02 },
-        { name: "云南白药", weight: 0.05 },
-        { name: "酒精棉片", weight: 0.02 },
-        { name: "碘伏", weight: 0.05 },
-        { name: "纱布", weight: 0.02 },
-        { name: "医用胶带", weight: 0.02 },
-        { name: "体温计", weight: 0.05 },
-        { name: "红景天", weight: 0.05 },
-        { name: "维生素", weight: 0.05 },
-        { name: "眼药水", weight: 0.02 },
-        { name: "清凉油", weight: 0.02 },
-        { name: "风油精", weight: 0.02 },
-        { name: "口罩", weight: 0.01 },
-        { name: "免洗洗手液", weight: 0.1 },
-        { name: "酒精喷雾", weight: 0.1 }
+        { name: "晕车药", weight: 0.03 }
     ],
     "toiletries": [
         { name: "牙刷", weight: 0.02 },
         { name: "牙膏", weight: 0.1 },
-        { name: "牙线", weight: 0.01 },
-        { name: "漱口水", weight: 0.15 },
         { name: "洗面奶", weight: 0.12 },
-        { name: "洁面巾", weight: 0.05 },
         { name: "洗发水", weight: 0.15 },
-        { name: "护发素", weight: 0.15 },
         { name: "沐浴露", weight: 0.15 },
-        { name: "香皂", weight: 0.1 },
-        { name: "洗手液", weight: 0.12 },
         { name: "毛巾", weight: 0.15 },
-        { name: "浴巾", weight: 0.3 },
         { name: "防晒霜", weight: 0.1 },
-        { name: "晒后修复", weight: 0.1 },
-        { name: "面霜", weight: 0.08 },
-        { name: "精华", weight: 0.05 },
-        { name: "眼霜", weight: 0.03 },
-        { name: "面膜", weight: 0.05 },
-        { name: "爽肤水", weight: 0.15 },
-        { name: "乳液", weight: 0.12 },
-        { name: "身体乳", weight: 0.15 },
-        { name: "护手霜", weight: 0.05 },
-        { name: "润唇膏", weight: 0.02 },
-        { name: "剃须刀片", weight: 0.02 },
-        { name: "剃须泡沫", weight: 0.1 },
-        { name: "须后水", weight: 0.1 },
         { name: "梳子", weight: 0.05 },
-        { name: "发圈", weight: 0.01 },
-        { name: "发卡", weight: 0.01 },
-        { name: "指甲刀", weight: 0.05 },
-        { name: "剪刀", weight: 0.05 },
-        { name: "镜子", weight: 0.1 },
-        { name: "棉签", weight: 0.02 },
-        { name: "化妆棉", weight: 0.05 },
-        { name: "湿巾", weight: 0.1 },
-        { name: "纸巾", weight: 0.05 },
-        { name: "卫生巾", weight: 0.1 },
-        { name: "护垫", weight: 0.05 },
-        { name: "剃毛器", weight: 0.2 },
-        { name: "香水", weight: 0.1 },
-        { name: "香体喷雾", weight: 0.1 },
-        { name: "驱蚊液", weight: 0.1 },
-        { name: "止痒膏", weight: 0.03 },
-        { name: "拖鞋", weight: 0.15 },
-        { name: "浴帽", weight: 0.02 },
-        { name: "压缩毛巾", weight: 0.05 },
-        { name: "折叠衣架", weight: 0.1 },
-        { name: "洗衣液", weight: 0.15 },
-        { name: "晾衣绳", weight: 0.05 },
-        { name: "密封袋", weight: 0.02 },
-        { name: "垃圾袋", weight: 0.02 },
-        { name: "保鲜袋", weight: 0.02 }
+        { name: "纸巾", weight: 0.05 }
     ],
     "makeup": [
         { name: "粉底液", weight: 0.05 },
@@ -272,49 +197,6 @@ const itemsTemplates = {
         { name: "美瞳", weight: 0.01 },
         { name: "美瞳盒", weight: 0.05 },
         { name: "护理液", weight: 0.1 }
-    ],
-    "accessories": [
-        { name: "行李箱", weight: 3.0 },
-        { name: "背包", weight: 0.5 },
-        { name: "腰包", weight: 0.15 },
-        { name: "行李牌", weight: 0.02 },
-        { name: "行李绳", weight: 0.05 },
-        { name: "行李秤", weight: 0.2 },
-        { name: "行李锁", weight: 0.05 },
-        { name: "压缩袋", weight: 0.05 },
-        { name: "收纳包", weight: 0.1 },
-        { name: "鞋袋", weight: 0.05 },
-        { name: "证件包", weight: 0.1 },
-        { name: "钱包", weight: 0.15 },
-        { name: "零钱包", weight: 0.05 },
-        { name: "雨伞", weight: 0.3 },
-        { name: "雨衣", weight: 0.15 },
-        { name: "保温杯", weight: 0.3 },
-        { name: "水杯", weight: 0.2 },
-        { name: "折叠水壶", weight: 0.1 },
-        { name: "便携餐具", weight: 0.1 },
-        { name: "保鲜盒", weight: 0.15 },
-        { name: "眼罩", weight: 0.02 },
-        { name: "耳塞", weight: 0.01 },
-        { name: "颈枕", weight: 0.2 },
-        { name: "充气枕", weight: 0.15 },
-        { name: "毛毯", weight: 0.5 },
-        { name: "暖宝宝", weight: 0.05 },
-        { name: "冰袋", weight: 0.1 },
-        { name: "手电筒", weight: 0.1 },
-        { name: "指南针", weight: 0.05 },
-        { name: "哨子", weight: 0.01 },
-        { name: "防狼喷雾", weight: 0.1 },
-        { name: "急救包", weight: 0.2 },
-        { name: "针线包", weight: 0.05 },
-        { name: "胶带", weight: 0.05 },
-        { name: "绳子", weight: 0.1 },
-        { name: "塑料袋", weight: 0.02 },
-        { name: "购物袋", weight: 0.05 },
-        { name: "笔记本", weight: 0.2 },
-        { name: "书籍", weight: 0.3 },
-        { name: "地图", weight: 0.05 },
-        { name: "旅行指南", weight: 0.3 }
     ]
 };
 
@@ -324,6 +206,5 @@ const categories = [
     { id: 'electronics', name: '电子产品', icon: '📱' },
     { id: 'medicine', name: '药品类', icon: '💊' },
     { id: 'toiletries', name: '洗漱用品', icon: '🧴' },
-    { id: 'makeup', name: '化妆品', icon: '💄', forFemale: true },
-    { id: 'accessories', name: '配件杂物', icon: '🎒' }
+    { id: 'makeup', name: '化妆品', icon: '💄', forFemale: true }
 ];
