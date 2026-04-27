@@ -201,8 +201,8 @@ function loadTrips() {
     }).join('');
 }
 
-// 创建清单
-function createTrip() {
+// 创建清单（异步）
+async function createTrip() {
     const title = document.getElementById('tripTitle').value.trim();
     const destination = document.getElementById('tripDestination').value.trim();
     const startDate = document.getElementById('tripStartDate').value;
@@ -215,6 +215,12 @@ function createTrip() {
         alert('请填写完整信息');
         return;
     }
+
+    // 显示加载提示
+    const submitBtn = document.querySelector('.form-submit');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '正在生成清单...';
+    submitBtn.disabled = true;
 
     const tripId = 'trip_' + Date.now();
     const trip = {
@@ -234,7 +240,8 @@ function createTrip() {
     trips.push(trip);
     saveTripsData(trips);
 
-    generateInitialItems(tripId, trip.includeMakeup);
+    // 异步生成物品（含天气查询）
+    await generateInitialItems(tripId, trip.includeMakeup);
 
     // 清空表单
     document.getElementById('tripTitle').value = '';
@@ -242,6 +249,9 @@ function createTrip() {
     document.getElementById('tripStartDate').value = '';
     document.getElementById('tripEndDate').value = '';
     document.querySelectorAll('.option-btn.selected').forEach(btn => btn.classList.remove('selected'));
+    
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
 
     openTrip(tripId);
 }
@@ -268,11 +278,29 @@ function openTrip(tripId) {
     showPage('detailPage');
 }
 
-// 渲染旅行信息
-function renderTripInfo(trip) {
-    // 计算天气（简化版，实际应该调用天气API）
-    const weather = getWeatherInfo(trip.destination, trip.startDate);
+// 渲染旅行信息（异步获取真实天气）
+async function renderTripInfo(trip) {
+    // 先显示加载状态
+    document.getElementById('tripInfoCard').innerHTML = `
+        <div class="trip-info-header">
+            <div class="trip-info-main">
+                <div class="trip-info-destination">📍 ${trip.destination}</div>
+                <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
+            </div>
+            <div class="trip-info-weather">
+                <div class="trip-info-temp">--°</div>
+                <div class="trip-info-desc">加载中...</div>
+            </div>
+        </div>
+    `;
     
+    // 查询真实天气
+    const weather = await getWeather(trip.destination, trip.startDate, trip.endDate);
+    
+    // 保存天气数据到清单
+    saveWeatherToTrip(trip.id, weather);
+    
+    // 更新显示
     const html = `
         <div class="trip-info-header">
             <div class="trip-info-main">
@@ -280,8 +308,8 @@ function renderTripInfo(trip) {
                 <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
             </div>
             <div class="trip-info-weather">
-                <div class="trip-info-temp">${weather.temp}°</div>
-                <div class="trip-info-desc">${weather.desc}</div>
+                <div class="trip-info-temp">${weather.tempAvg}°</div>
+                <div class="trip-info-desc">${weather.icon} ${weather.description}</div>
             </div>
         </div>
     `;
@@ -289,22 +317,14 @@ function renderTripInfo(trip) {
     document.getElementById('tripInfoCard').innerHTML = html;
 }
 
-// 简化的天气信息（实际应该调用API）
-function getWeatherInfo(destination, date) {
-    const month = new Date(date).getMonth() + 1;
-    
-    // 根据月份和目的地简单估算
-    const weathers = {
-        spring: { temp: '18-25', desc: '☀️ 晴朗' },
-        summer: { temp: '25-35', desc: '🌤 炎热' },
-        autumn: { temp: '15-22', desc: '🍂 凉爽' },
-        winter: { temp: '0-10', desc: '❄️ 寒冷' }
-    };
-    
-    if (month >= 3 && month <= 5) return weathers.spring;
-    if (month >= 6 && month <= 8) return weathers.summer;
-    if (month >= 9 && month <= 11) return weathers.autumn;
-    return weathers.winter;
+// 保存天气到清单
+function saveWeatherToTrip(tripId, weather) {
+    const trips = JSON.parse(localStorage.getItem('trips') || '[]');
+    const trip = trips.find(t => t.id === tripId);
+    if (trip) {
+        trip.weather = weather;
+        localStorage.setItem('trips', JSON.stringify(trips));
+    }
 }
 
 // 格式化日期
@@ -517,14 +537,19 @@ function markAsBought(itemId) {
     }
 }
 
-// 生成初始物品（含目的地特殊物品）
-function generateInitialItems(tripId, includeMakeup) {
+// 生成初始物品（含目的地特殊物品和天气推荐）
+async function generateInitialItems(tripId, includeMakeup) {
     const allItems = JSON.parse(localStorage.getItem('items') || '[]');
     const trip = getTripsData().find(t => t.id === tripId);
     
-    // 基础物品
+    // 获取天气
+    const weather = await getWeather(trip.destination, trip.startDate, trip.endDate);
+    saveWeatherToTrip(tripId, weather);
+    
+    // 基础物品（除了衣物，衣物根据天气推荐）
     categories.forEach(cat => {
         if (cat.id === 'makeup' && !includeMakeup) return;
+        if (cat.id === 'clothing') return; // 衣物单独处理
         
         const templates = itemsTemplates[cat.id] || [];
         templates.forEach((template, index) => {
@@ -538,6 +563,22 @@ function generateInitialItems(tripId, includeMakeup) {
                 needToBuy: false,
                 bought: false
             });
+        });
+    });
+
+    // 根据天气推荐衣物
+    const clothingRecommendations = recommendClothingByWeather(weather.tempAvg);
+    clothingRecommendations.forEach((item, index) => {
+        allItems.push({
+            id: 'item_weather_' + Date.now() + '_' + index + '_' + Math.random(),
+            tripId,
+            category: item.category,
+            name: item.name,
+            weight: item.weight,
+            packed: false,
+            needToBuy: false,
+            bought: false,
+            isWeatherRecommended: true
         });
     });
 
