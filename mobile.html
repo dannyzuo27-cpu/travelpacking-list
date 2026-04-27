@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>旅行清单 - 移动版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background: linear-gradient(135deg, #96c1dd 0%, #a7b408 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* 登录注册页面 */
+        .auth-container {
+            padding: 60px 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-logo {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .auth-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: #ffb40f;
+            background: #fffef8;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(255, 180, 15, 0.3);
+        }
+
+        .auth-btn:active {
+            transform: scale(0.98);
+        }
+
+        .auth-switch {
+            text-align: center;
+            color: #666;
+            font-size: 15px;
+            padding: 16px 0;
+        }
+
+        .auth-switch a {
+            color: #e41e71;
+            font-weight: 600;
+        }
+
+        .auth-error {
+            color: #ef4444;
+            font-size: 14px;
+            margin-bottom: 16px;
+            text-align: center;
+            padding: 8px;
+            background: #fee;
+            border-radius: 8px;
+        }
+
+        /* 页面切换 */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* 顶部栏 */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e41e71;
+        }
+
+        .header-btn {
+            padding: 8px 16px;
+            background: #ffb40f;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header-btn.secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        /* 首页 */
+        .home-container {
+            padding: 20px;
+        }
+
+        .user-info {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .username {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e41e71;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: white;
+            color: #e41e71;
+            border: 2px solid #ff9191;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .action-btn {
+            padding: 16px;
+            background: white;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-btn.create {
+            background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
+            color: white;
+            grid-column: span 2;
+        }
+
+        .action-btn.shopping {
+            color: #e41e71;
+        }
+
+        .trip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .trip-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #f8e473;
+        }
+
+        .trip-card:nth-child(2n) {
+            border-left-color: #ffb40f;
+        }
+
+        .trip-card:nth-child(3n) {
+            border-left-color: #e41e71;
+        }
+
+        .trip-card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e41e71;
+            margin-bottom: 8px;
+        }
+
+        .trip-card-meta {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 16px;
+        }
+
+        .trip-progress {
+            margin-bottom: 12px;
+        }
+
+        .trip-progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .trip-progress-bar {
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .trip-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffb40f 0%, #f8e473 100%);
+            transition: width 0.3s ease;
+        }
+
+        .trip-progress-fill.weight {
+            background: linear-gradient(90deg, #a7b408 0%, #96c1dd 100%);
+        }
+
+        /* 创建表单 */
+        .form-container {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #e41e71;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ffb40f;
+            background: #fffef8;
+        }
+
+        .form-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .form-options.three-col {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .option-btn {
+            padding: 14px 12px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            background: white;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .option-btn.selected {
+            background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
+            color: white;
+            border-color: #ffb40f;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 24px;
+            box-shadow: 0 4px 12px rgba(255, 180, 15, 0.3);
+        }
+
+        /* 详情页 */
+        .detail-container {
+            padding-bottom: 100px;
+        }
+
+        .categories-nav {
+            position: sticky;
+            top: 64px;
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            white-space: nowrap;
+            z-index: 50;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .categories-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tab {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-right: 12px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .category-tab.active {
+            background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
+            color: white;
+        }
+
+        .items-container {
+            padding: 20px;
+        }
+
+        .items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .items-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e41e71;
+        }
+
+        .add-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            line-height: 40px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(255, 180, 15, 0.3);
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .item-checkbox {
+            width: 28px;
+            height: 28px;
+            accent-color: #ffb40f;
+            flex-shrink: 0;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .item-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 13px;
+            color: #999;
+        }
+
+        .item-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .item-status.packed {
+            background: #f8e473;
+            color: #666;
+        }
+
+        .item-status.pending {
+            background: #ff9191;
+            color: white;
+        }
+
+        .buy-checkbox {
+            width: 24px;
+            height: 24px;
+            accent-color: #e41e71;
+            flex-shrink: 0;
+        }
+
+        /* 底部统计 */
+        .bottom-stats {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 100;
+        }
+
+        .bottom-stats.active {
+            display: block;
+        }
+
+        .stat-row {
+            margin-bottom: 12px;
+        }
+
+        .stat-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: #e41e71;
+            margin-bottom: 6px;
+        }
+
+        .stat-bar {
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .stat-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffb40f 0%, #f8e473 100%);
+            transition: width 0.3s ease;
+        }
+
+        .stat-fill.weight {
+            background: linear-gradient(90deg, #a7b408 0%, #96c1dd 100%);
+        }
+
+        /* 对话框 */
+        .dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .dialog-overlay.active {
+            display: flex;
+        }
+
+        .dialog-box {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .dialog-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e41e71;
+            margin-bottom: 20px;
+        }
+
+        .dialog-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .dialog-input:focus {
+            outline: none;
+            border-color: #ffb40f;
+        }
+
+        .dialog-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .dialog-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .dialog-btn.primary {
+            background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
+            color: white;
+        }
+
+        .dialog-btn.secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            margin-bottom: 24px;
+            opacity: 0.9;
+        }
+
+        /* 购物清单 */
+        .shopping-container {
+            padding: 20px;
+        }
+
+        .shopping-group {
+            margin-bottom: 24px;
+        }
+
+        .shopping-group-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e41e71;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .shopping-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .shopping-checkbox {
+            width: 24px;
+            height: 24px;
+            accent-color: #ffb40f;
+        }
+
+        .shopping-name {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .shopping-weight {
+            font-size: 13px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页 -->
+    <div class="page active" id="loginPage">
+        <div class="auth-container">
+            <div class="auth-logo">🧳</div>
+            <div class="auth-title">旅行清单</div>
+            <div class="auth-card">
+                <div class="auth-error" id="loginError" style="display: none;"></div>
+                <input type="text" class="auth-input" id="loginUsername" placeholder="用户名">
+                <input type="password" class="auth-input" id="loginPassword" placeholder="密码">
+                <button class="auth-btn" onclick="login()">登录</button>
+                <div class="auth-switch">
+                    还没有账号？<a onclick="showPage('registerPage')">立即注册</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册页 -->
+    <div class="page" id="registerPage">
+        <div class="auth-container">
+            <div class="auth-logo">🧳</div>
+            <div class="auth-title">注册账号</div>
+            <div class="auth-card">
+                <div class="auth-error" id="registerError" style="display: none;"></div>
+                <input type="text" class="auth-input" id="registerUsername" placeholder="用户名（4-20个字符）">
+                <input type="password" class="auth-input" id="registerPassword" placeholder="密码（至少6个字符）">
+                <input type="password" class="auth-input" id="registerConfirm" placeholder="确认密码">
+                <button class="auth-btn" onclick="register()">注册</button>
+                <div class="auth-switch">
+                    已有账号？<a onclick="showPage('loginPage')">立即登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 首页 -->
+    <div class="page" id="homePage">
+        <div class="header">
+            <div class="header-title">🧳 我的清单</div>
+        </div>
+        
+        <div class="home-container">
+            <div class="user-info">
+                <span class="username" id="currentUser"></span>
+                <button class="logout-btn" onclick="logout()">退出</button>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn shopping" onclick="showPage('shoppingPage')">🛒 购物清单</button>
+                <button class="action-btn create" onclick="showPage('createPage')">＋ 创建新清单</button>
+            </div>
+
+            <div class="trip-list" id="tripList"></div>
+        </div>
+    </div>
+
+    <!-- 创建页 -->
+    <div class="page" id="createPage">
+        <div class="header">
+            <button class="header-btn secondary" onclick="showPage('homePage')">← 返回</button>
+            <div class="header-title">创建清单</div>
+            <div style="width: 48px;"></div>
+        </div>
+
+        <div class="form-container">
+            <div class="form-group">
+                <label class="form-label">清单标题</label>
+                <input type="text" class="form-input" id="tripTitle" placeholder="例如：西藏6日游">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">目的地</label>
+                <input type="text" class="form-input" id="tripDestination" placeholder="输入目的地">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">出发日期</label>
+                <input type="date" class="form-input" id="tripStartDate">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">返回日期</label>
+                <input type="date" class="form-input" id="tripEndDate">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">旅行类型</label>
+                <div class="form-options three-col" id="tripTypeOptions">
+                    <button class="option-btn" data-value="vacation">度假</button>
+                    <button class="option-btn" data-value="self_drive">自驾</button>
+                    <button class="option-btn" data-value="hiking">徒步</button>
+                    <button class="option-btn" data-value="skiing">滑雪</button>
+                    <button class="option-btn" data-value="camping">露营</button>
+                    <button class="option-btn" data-value="business">出差</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">行李限制</label>
+                <div class="form-options three-col" id="luggageOptions">
+                    <button class="option-btn" data-value="7">7kg</button>
+                    <button class="option-btn" data-value="23">23kg</button>
+                    <button class="option-btn" data-value="999">无限制</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">需要化妆品清单吗？</label>
+                <div class="form-options" id="genderOptions">
+                    <button class="option-btn" data-value="yes">需要</button>
+                    <button class="option-btn" data-value="no">不需要</button>
+                </div>
+            </div>
+
+            <button class="form-submit" onclick="createTrip()">生成清单</button>
+        </div>
+    </div>
+
+    <!-- 详情页 -->
+    <div class="page" id="detailPage">
+        <div class="header">
+            <button class="header-btn secondary" onclick="showPage('homePage')">← 返回</button>
+            <div class="header-title" id="detailTitle"></div>
+            <div style="width: 48px;"></div>
+        </div>
+
+        <div class="categories-nav" id="categoriesNav"></div>
+
+        <div class="items-container">
+            <div class="items-header">
+                <div class="items-title" id="categoryTitle"></div>
+                <button class="add-btn" onclick="showAddItemDialog()">+</button>
+            </div>
+            <div id="itemsList"></div>
+        </div>
+    </div>
+
+    <!-- 购物清单页 -->
+    <div class="page" id="shoppingPage">
+        <div class="header">
+            <button class="header-btn secondary" onclick="showPage('homePage')">← 返回</button>
+            <div class="header-title">🛒 购物清单</div>
+            <div style="width: 48px;"></div>
+        </div>
+
+        <div class="shopping-container" id="shoppingContainer"></div>
+    </div>
+
+    <!-- 底部统计 -->
+    <div class="bottom-stats" id="bottomStats">
+        <div class="stat-row">
+            <div class="stat-label">
+                <span>打包进度</span>
+                <span id="packProgress">0 / 0</span>
+            </div>
+            <div class="stat-bar">
+                <div class="stat-fill" id="packBar"></div>
+            </div>
+        </div>
+        <div class="stat-row">
+            <div class="stat-label">
+                <span>行李重量</span>
+                <span id="weightProgress">0 kg</span>
+            </div>
+            <div class="stat-bar">
+                <div class="stat-fill weight" id="weightBar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加物品对话框 -->
+    <div class="dialog-overlay" id="addItemDialog">
+        <div class="dialog-box">
+            <div class="dialog-title">添加新物品</div>
+            <input type="text" class="dialog-input" id="newItemName" placeholder="物品名称">
+            <input type="number" class="dialog-input" id="newItemWeight" placeholder="重量(kg)" step="0.01">
+            <div class="dialog-buttons">
+                <button class="dialog-btn secondary" onclick="hideAddItemDialog()">取消</button>
+                <button class="dialog-btn primary" onclick="addNewItem()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="mobile.js"></script>
+</body>
+</html>
