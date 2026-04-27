@@ -55,62 +55,107 @@ const cityCoordinates = {
     "冲绳": { lat: 26.2124, lon: 127.6809 }
 };
 
-// 查询天气
+// 查询天气（多天）
 async function getWeather(destination, startDate, endDate) {
     try {
         // 查找城市坐标
         const coords = findCityCoordinates(destination);
         if (!coords) {
             console.log('未找到城市坐标，使用默认天气');
-            return getDefaultWeather(startDate);
+            return getDefaultWeatherMultiDay(startDate, endDate);
         }
 
         // 判断日期是否太远（超过14天使用去年数据）
         const start = new Date(startDate);
+        const end = new Date(endDate);
         const today = new Date();
         const daysFromNow = Math.floor((start - today) / (1000 * 60 * 60 * 24));
         
-        let queryDate = startDate;
+        let queryStartDate = startDate;
+        let queryEndDate = endDate;
         let isHistorical = false;
         
         if (daysFromNow > 14) {
             // 使用去年同期数据
-            const lastYear = new Date(start);
-            lastYear.setFullYear(lastYear.getFullYear() - 1);
-            queryDate = lastYear.toISOString().split('T')[0];
+            const lastYearStart = new Date(start);
+            lastYearStart.setFullYear(lastYearStart.getFullYear() - 1);
+            queryStartDate = lastYearStart.toISOString().split('T')[0];
+            
+            const lastYearEnd = new Date(end);
+            lastYearEnd.setFullYear(lastYearEnd.getFullYear() - 1);
+            queryEndDate = lastYearEnd.toISOString().split('T')[0];
+            
             isHistorical = true;
         }
 
         // 调用 API
         const url = isHistorical
-            ? `https://archive-api.open-meteo.com/v1/archive?latitude=${coords.lat}&longitude=${coords.lon}&start_date=${queryDate}&end_date=${queryDate}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`
-            : `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
+            ? `https://archive-api.open-meteo.com/v1/archive?latitude=${coords.lat}&longitude=${coords.lon}&start_date=${queryStartDate}&end_date=${queryEndDate}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`
+            : `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&start_date=${startDate}&end_date=${endDate}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
 
         const response = await fetch(url);
         const data = await response.json();
 
         if (!data.daily) {
-            return getDefaultWeather(startDate);
+            return getDefaultWeatherMultiDay(startDate, endDate);
         }
 
-        // 解析天气数据
-        const tempMax = Math.round(data.daily.temperature_2m_max[0]);
-        const tempMin = Math.round(data.daily.temperature_2m_min[0]);
-        const weatherCode = data.daily.weathercode[0];
+        // 解析多天天气数据
+        const days = [];
+        const length = Math.min(data.daily.time.length, 7); // 最多显示7天
+        
+        for (let i = 0; i < length; i++) {
+            const tempMax = Math.round(data.daily.temperature_2m_max[i]);
+            const tempMin = Math.round(data.daily.temperature_2m_min[i]);
+            const weatherCode = data.daily.weathercode[i];
+            
+            days.push({
+                date: data.daily.time[i],
+                tempMax,
+                tempMin,
+                tempAvg: Math.round((tempMax + tempMin) / 2),
+                description: getWeatherDescription(weatherCode),
+                icon: getWeatherIcon(weatherCode)
+            });
+        }
+
+        // 计算平均温度（用于推荐衣物）
+        const avgTemp = Math.round(days.reduce((sum, d) => sum + d.tempAvg, 0) / days.length);
 
         return {
-            tempMax,
-            tempMin,
-            tempAvg: Math.round((tempMax + tempMin) / 2),
-            description: getWeatherDescription(weatherCode),
-            icon: getWeatherIcon(weatherCode),
+            days,
+            tempAvg: avgTemp,
             isHistorical
         };
 
     } catch (error) {
         console.error('天气查询失败:', error);
-        return getDefaultWeather(startDate);
+        return getDefaultWeatherMultiDay(startDate, endDate);
     }
+}
+
+// 默认天气（多天）
+function getDefaultWeatherMultiDay(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const dayCount = Math.min(Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1, 7);
+    
+    const days = [];
+    for (let i = 0; i < dayCount; i++) {
+        const date = new Date(start);
+        date.setDate(date.getDate() + i);
+        
+        const weather = getDefaultWeather(date.toISOString().split('T')[0]);
+        days.push({
+            date: date.toISOString().split('T')[0],
+            ...weather,
+            tempAvg: Math.round((weather.tempMax + weather.tempMin) / 2)
+        });
+    }
+    
+    const avgTemp = Math.round(days.reduce((sum, d) => sum + d.tempAvg, 0) / days.length);
+    
+    return { days, tempAvg: avgTemp };
 }
 
 // 查找城市坐标（支持模糊匹配）

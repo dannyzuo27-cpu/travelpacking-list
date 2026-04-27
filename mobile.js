@@ -288,17 +288,25 @@ async function renderTripInfo(trip) {
                 <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
             </div>
             <div class="trip-info-weather">
-                <div class="trip-info-temp">--°</div>
-                <div class="trip-info-desc">加载中...</div>
+                <div class="trip-info-desc">🔄 加载天气中...</div>
             </div>
         </div>
     `;
     
-    // 查询真实天气
-    const weather = await getWeather(trip.destination, trip.startDate, trip.endDate);
+    // 查询真实天气（如果已缓存则直接使用）
+    let weather = trip.weather;
+    if (!weather) {
+        weather = await getWeather(trip.destination, trip.startDate, trip.endDate);
+        saveWeatherToTrip(trip.id, weather);
+    }
     
-    // 保存天气数据到清单
-    saveWeatherToTrip(trip.id, weather);
+    // 渲染多天天气
+    const weatherHtml = weather.days ? weather.days.map(day => `
+        <div class="weather-day">
+            <span class="weather-day-date">${formatMonthDay(day.date)} ${day.icon}</span>
+            <span class="weather-day-temp">${day.tempMin}°-${day.tempMax}°</span>
+        </div>
+    `).join('') : `<div class="trip-info-temp">${weather.tempAvg}°</div>`;
     
     // 更新显示
     const html = `
@@ -308,13 +316,20 @@ async function renderTripInfo(trip) {
                 <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
             </div>
             <div class="trip-info-weather">
-                <div class="trip-info-temp">${weather.tempAvg}°</div>
-                <div class="trip-info-desc">${weather.icon} ${weather.description}</div>
+                ${weatherHtml}
             </div>
         </div>
     `;
     
     document.getElementById('tripInfoCard').innerHTML = html;
+}
+
+// 格式化月日
+function formatMonthDay(dateStr) {
+    const date = new Date(dateStr);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${month}/${day}`;
 }
 
 // 保存天气到清单
@@ -376,33 +391,51 @@ function loadCategoryItems() {
     const category = categories.find(c => c.id === currentCategory);
     document.getElementById('categoryTitle').textContent = category.name;
 
-    const html = items.map(item => `
-        <div class="item-card">
-            <input type="checkbox" class="item-checkbox" ${item.packed ? 'checked' : ''} onchange="toggleItem('${item.id}')">
-            <div class="item-info">
-                <div class="item-name">${item.name}</div>
-                <div class="item-meta">
-                    <span>${(item.weight * 1000).toFixed(0)}g</span>
-                    <span>待购买 <input type="checkbox" class="buy-checkbox" ${item.needToBuy ? 'checked' : ''} onchange="toggleBuy('${item.id}'); event.stopPropagation();"></span>
+    const html = items.map(item => {
+        const packedByInfo = item.packed && item.packedBy 
+            ? `<div class="packed-by">✓ <span class="packed-by-name">${item.packedBy}</span></div>`
+            : '';
+        
+        return `
+            <div class="item-card">
+                <input type="checkbox" class="item-checkbox" ${item.packed ? 'checked' : ''} onchange="toggleItem('${item.id}')">
+                <div class="item-info">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-meta">
+                        <span>${(item.weight * 1000).toFixed(0)}g</span>
+                        <span>待购买 <input type="checkbox" class="buy-checkbox" ${item.needToBuy ? 'checked' : ''} onchange="toggleBuy('${item.id}'); event.stopPropagation();"></span>
+                    </div>
+                    ${packedByInfo}
                 </div>
+                <span class="item-status ${item.packed ? 'packed' : 'pending'}">
+                    ${item.packed ? '已打包' : '待打包'}
+                </span>
             </div>
-            <span class="item-status ${item.packed ? 'packed' : 'pending'}">
-                ${item.packed ? '已打包' : '待打包'}
-            </span>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     document.getElementById('itemsList').innerHTML = html;
     updateOverallProgress();
 }
 
-// 切换打包状态
+// 切换打包状态（记录打包人）
 function toggleItem(itemId) {
     const allItems = JSON.parse(localStorage.getItem('items') || '[]');
     const item = allItems.find(i => i.id === itemId);
     
     if (item) {
         item.packed = !item.packed;
+        
+        if (item.packed) {
+            // 记录打包人和时间
+            item.packedBy = currentUser;
+            item.packedAt = new Date().toISOString();
+        } else {
+            // 取消打包时清除记录
+            delete item.packedBy;
+            delete item.packedAt;
+        }
+        
         localStorage.setItem('items', JSON.stringify(allItems));
         loadCategoryItems();
     }

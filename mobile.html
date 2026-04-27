@@ -387,19 +387,43 @@
 
         .trip-info-weather {
             text-align: right;
+            max-width: 50%;
         }
 
         .trip-info-temp {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             color: #c09f7e;
-            line-height: 1;
+            line-height: 1.2;
             margin-bottom: 4px;
         }
 
         .trip-info-desc {
-            font-size: 13px;
+            font-size: 12px;
             color: #999;
+            line-height: 1.4;
+        }
+
+        .weather-day {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .weather-day:last-child {
+            margin-bottom: 0;
+        }
+
+        .weather-day-date {
+            font-weight: 600;
+        }
+
+        .weather-day-temp {
+            color: #c09f7e;
+            font-weight: 700;
         }
 
         .categories-nav {
@@ -523,6 +547,17 @@
         .item-status.pending {
             background: #ff9191;
             color: white;
+        }
+
+        .packed-by {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .packed-by-name {
+            color: #a4ceb7;
+            font-weight: 600;
         }
 
         .buy-checkbox {
