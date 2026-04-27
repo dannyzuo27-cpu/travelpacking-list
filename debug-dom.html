@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM对比</title>
+</head>
+<body>
+    <h2>请在Safari打开这个页面，然后：</h2>
+    <ol>
+        <li>打开开发者工具（Command + Option + I）</li>
+        <li>在Console里粘贴下面的代码：</li>
+    </ol>
+    
+    <h3>步骤1：在test-scroll.html执行</h3>
+    <pre style="background: #f0f0f0; padding: 10px; overflow-x: auto;">
+const container = document.querySelector('.weather-scroll-container');
+console.log('容器样式:', window.getComputedStyle(container));
+console.log('容器宽度:', container.offsetWidth);
+console.log('内容宽度:', container.scrollWidth);
+console.log('是否可滚动:', container.scrollWidth > container.offsetWidth);
+    </pre>
+    
+    <h3>步骤2：在mobile.html执行</h3>
+    <pre style="background: #f0f0f0; padding: 10px; overflow-x: auto;">
+const container = document.querySelector('.weather-scroll') || document.querySelector('[style*="overflow-x: scroll"]');
+console.log('容器样式:', window.getComputedStyle(container));
+console.log('容器宽度:', container.offsetWidth);
+console.log('内容宽度:', container.scrollWidth);
+console.log('是否可滚动:', container.scrollWidth > container.offsetWidth);
+    </pre>
+    
+    <h3>对比这些数据：</h3>
+    <ul>
+        <li>容器宽度（offsetWidth）</li>
+        <li>内容宽度（scrollWidth）</li>
+        <li>scrollWidth > offsetWidth 必须是 true 才能滚动</li>
+    </ul>
+    
+    <p>把两个页面的输出截图发给我！</p>
+</body>
+</html>
