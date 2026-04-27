@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅行清单 - 智能打包助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background-color: #a6cacb;
+            min-height: 100vh;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 顶部导航 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 48px;
+            padding: 24px 32px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c5f5d;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: #e3f0c7;
+            color: #2c5f5d;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-btn.secondary {
+            background: white;
+            border: 2px solid #e3f0c7;
+        }
+
+        /* 主内容区 */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* 首页 - 卡片网格 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .trip-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-top: 4px solid #e3f0c7;
+        }
+
+        .trip-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .trip-card:nth-child(2) {
+            border-top-color: #fffadb;
+        }
+
+        .trip-card:nth-child(3) {
+            border-top-color: #ffdcbb;
+        }
+
+        .trip-card-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c5f5d;
+            margin-bottom: 12px;
+        }
+
+        .trip-card-meta {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .trip-card-progress {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 16px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #e3f0c7;
+            transition: width 0.3s ease;
+        }
+
+        /* 创建页面 */
+        .create-form {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c5f5d;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c5f5d;
+            margin-bottom: 12px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #e3f0c7;
+        }
+
+        .form-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .option-btn {
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            color: #2c5f5d;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            border-color: #e3f0c7;
+            background: #fafff0;
+        }
+
+        .option-btn.selected {
+            background: #e3f0c7;
+            color: #2c5f5d;
+            border-color: #e3f0c7;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 18px;
+            background: #e3f0c7;
+            color: #2c5f5d;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 详情页面 */
+        .detail-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+        }
+
+        /* 左侧分类导航 */
+        .categories-sidebar {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            height: fit-content;
+            position: sticky;
+            top: 24px;
+        }
+
+        .category-nav-item {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #2c5f5d;
+            font-weight: 600;
+        }
+
+        .category-nav-item:hover {
+            background: #f5f5f5;
+        }
+
+        .category-nav-item.active {
+            background: #e3f0c7;
+            color: #2c5f5d;
+        }
+
+        .category-badge {
+            background: rgba(166, 202, 203, 0.3);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .category-nav-item.active .category-badge {
+            background: rgba(44, 95, 93, 0.15);
+        }
+
+        /* 右侧内容区 */
+        .detail-content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .detail-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c5f5d;
+        }
+
+        .detail-stats {
+            display: flex;
+            gap: 32px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 16px 24px;
+            background: #fffadb;
+            border-radius: 12px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c5f5d;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* 物品列表 */
+        .items-table {
+            width: 100%;
+        }
+
+        .items-table thead {
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .items-table th {
+            padding: 16px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .items-table td {
+            padding: 20px 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .items-table tr:hover {
+            background: #fafff0;
+        }
+
+        .item-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #e3f0c7;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c5f5d;
+        }
+
+        .item-weight {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .item-status {
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .item-status.packed {
+            background: #e3f0c7;
+            color: #2c5f5d;
+        }
+
+        .item-status.pending {
+            background: #ffdcbb;
+            color: #8b5a3c;
+        }
+
+        /* 底部进度条 */
+        .bottom-stats {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 2px solid #f0f0f0;
+            padding: 24px 40px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            gap: 48px;
+            justify-content: center;
+        }
+
+        .stat-progress {
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .stat-progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2c5f5d;
+        }
+
+        .stat-progress-bar {
+            height: 12px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .stat-progress-fill {
+            height: 100%;
+            background: #e3f0c7;
+            transition: width 0.4s ease;
+        }
+
+        .stat-progress-fill.weight {
+            background: #fffadb;
+        }
+
+        /* 添加物品按钮 */
+        .add-item-btn {
+            padding: 10px 20px;
+            background: #e3f0c7;
+            color: #2c5f5d;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-item-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 添加物品对话框 */
+        .dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog-overlay.active {
+            display: flex;
+        }
+
+        .dialog-box {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .dialog-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c5f5d;
+            margin-bottom: 24px;
+        }
+
+        .dialog-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+
+        .dialog-input:focus {
+            outline: none;
+            border-color: #e3f0c7;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .dialog-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-btn.primary {
+            background: #e3f0c7;
+            color: #2c5f5d;
+        }
+
+        .dialog-btn.secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .dialog-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <div class="header">
+            <div class="logo">🧳 旅行清单</div>
+            <div class="nav-buttons">
+                <button class="nav-btn secondary" onclick="showPage('home')">我的清单</button>
+                <button class="nav-btn" onclick="showPage('create')">＋ 创建新清单</button>
+            </div>
+        </div>
+
+        <!-- 首页 -->
+        <div class="page active" id="home">
+            <div class="cards-grid">
+                <div class="trip-card" onclick="showPage('detail')">
+                    <div class="trip-card-title">西藏6日游</div>
+                    <div class="trip-card-meta">2026年5月1日 - 5月6日 · 自驾游</div>
+                    <div class="trip-card-progress">
+                        <div class="progress-item">
+                            <span>打包进度</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 46%"></div>
+                            </div>
+                            <span>23/50</span>
+                        </div>
+                        <div class="progress-item">
+                            <span>行李重量</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 37%"></div>
+                            </div>
+                            <span>8.5/23kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="trip-card">
+                    <div class="trip-card-title">日本7日游</div>
+                    <div class="trip-card-meta">2026年6月15日 - 6月21日 · 廉航</div>
+                    <div class="trip-card-progress">
+                        <div class="progress-item">
+                            <span>打包进度</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 80%"></div>
+                            </div>
+                            <span>40/50</span>
+                        </div>
+                        <div class="progress-item">
+                            <span>行李重量</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
+                            <span>5.9/7kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="trip-card">
+                    <div class="trip-card-title">新疆10日游</div>
+                    <div class="trip-card-meta">2026年7月10日 - 7月19日 · 自驾游</div>
+                    <div class="trip-card-progress">
+                        <div class="progress-item">
+                            <span>打包进度</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 12%"></div>
+                            </div>
+                            <span>6/50</span>
+                        </div>
+                        <div class="progress-item">
+                            <span>行李重量</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 8%"></div>
+                            </div>
+                            <span>1.8/23kg</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 创建页面 -->
+        <div class="page" id="create">
+            <div class="create-form">
+                <div class="form-title">创建新的旅行清单</div>
+                
+                <div class="form-group">
+                    <label class="form-label">目的地</label>
+                    <input type="text" class="form-input" placeholder="输入你的旅行目的地">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">出行天数</label>
+                    <div class="form-options">
+                        <button class="option-btn">1-3天</button>
+                        <button class="option-btn">4-7天</button>
+                        <button class="option-btn">8-15天</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">旅行类型</label>
+                    <div class="form-options">
+                        <button class="option-btn">度假休闲</button>
+                        <button class="option-btn">自驾游</button>
+                        <button class="option-btn">徒步</button>
+                        <button class="option-btn">滑雪</button>
+                        <button class="option-btn">露营</button>
+                        <button class="option-btn">商务出差</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">行李限制</label>
+                    <div class="form-options">
+                        <button class="option-btn">廉航 (7kg)</button>
+                        <button class="option-btn">经济舱 (23kg)</button>
+                        <button class="option-btn">无限制</button>
+                    </div>
+                </div>
+
+                <button class="form-submit">生成清单</button>
+            </div>
+        </div>
+
+        <!-- 详情页面 -->
+        <div class="page" id="detail">
+            <div class="detail-container">
+                <!-- 左侧分类 -->
+                <div class="categories-sidebar">
+                    <div class="category-nav-item active">
+                        <span>📄 证件类</span>
+                        <span class="category-badge">2/3</span>
+                    </div>
+                    <div class="category-nav-item">
+                        <span>👕 衣物类</span>
+                        <span class="category-badge">1/12</span>
+                    </div>
+                    <div class="category-nav-item">
+                        <span>📱 电子产品</span>
+                        <span class="category-badge">0/8</span>
+                    </div>
+                    <div class="category-nav-item">
+                        <span>💊 药品类</span>
+                        <span class="category-badge">0/5</span>
+                    </div>
+                    <div class="category-nav-item">
+                        <span>🧴 洗漱用品</span>
+                        <span class="category-badge">3/8</span>
+                    </div>
+                </div>
+
+                <!-- 右侧内容 -->
+                <div class="detail-content">
+                    <div class="detail-header">
+                        <div class="detail-title" id="categoryTitle">证件类</div>
+                        <div style="display: flex; gap: 16px; align-items: center;">
+                            <button class="add-item-btn" onclick="showAddItemDialog()">＋ 添加物品</button>
+                            <div class="detail-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value" id="categoryProgress">2/16</div>
+                                    <div class="stat-label">已准备</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="categoryWeight">0.45kg</div>
+                                    <div class="stat-label">重量</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;"></th>
+                                <th>物品名称</th>
+                                <th>重量</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody">
+                            <!-- 动态加载物品 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加物品对话框 -->
+    <div class="dialog-overlay" id="addItemDialog">
+        <div class="dialog-box">
+            <div class="dialog-title">添加新物品</div>
+            <input type="text" class="dialog-input" id="newItemName" placeholder="物品名称">
+            <input type="number" class="dialog-input" id="newItemWeight" placeholder="重量(kg)" step="0.01">
+            <div class="dialog-buttons">
+                <button class="dialog-btn secondary" onclick="hideAddItemDialog()">取消</button>
+                <button class="dialog-btn primary" onclick="addNewItem()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部统计 -->
+    <div class="bottom-stats">
+        <div class="stat-progress">
+            <div class="stat-progress-label">
+                <span>打包进度</span>
+                <span>23 / 50 件</span>
+            </div>
+            <div class="stat-progress-bar">
+                <div class="stat-progress-fill" style="width: 46%"></div>
+            </div>
+        </div>
+        <div class="stat-progress">
+            <div class="stat-progress-label">
+                <span>行李重量</span>
+                <span>8.5 / 23 kg</span>
+            </div>
+            <div class="stat-progress-bar">
+                <div class="stat-progress-fill weight" style="width: 37%"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 完整物品数据库
+        const itemsDatabase = {
+            "documents": [
+                { name: "身份证", weight: 0.05, packed: true },
+                { name: "护照", weight: 0.1, packed: true },
+                { name: "签证复印件", weight: 0.02, packed: false },
+                { name: "边防证", weight: 0.05, packed: false },
+                { name: "驾驶证", weight: 0.05, packed: false },
+                { name: "国际驾照", weight: 0.05, packed: false },
+                { name: "学生证", weight: 0.03, packed: false },
+                { name: "机票行程单", weight: 0.01, packed: false },
+                { name: "酒店预订单", weight: 0.02, packed: false },
+                { name: "保险单", weight: 0.02, packed: false },
+                { name: "紧急联系卡", weight: 0.01, packed: false },
+                { name: "疫苗接种证明", weight: 0.02, packed: false },
+                { name: "银行卡", weight: 0.01, packed: false },
+                { name: "信用卡", weight: 0.01, packed: false },
+                { name: "现金（当地货币）", weight: 0.05, packed: false },
+                { name: "备用证件照", weight: 0.01, packed: false }
+            ],
+            "clothing": [
+                { name: "内衣", weight: 0.05, packed: false },
+                { name: "内裤", weight: 0.03, packed: false },
+                { name: "袜子", weight: 0.05, packed: false },
+                { name: "短袖T恤", weight: 0.15, packed: true },
+                { name: "长袖衬衫", weight: 0.2, packed: false },
+                { name: "长裤", weight: 0.3, packed: false },
+                { name: "短裤", weight: 0.2, packed: false },
+                { name: "冲锋衣", weight: 0.8, packed: false },
+                { name: "羽绒服", weight: 1.2, packed: false },
+                { name: "薄外套", weight: 0.4, packed: false },
+                { name: "防晒衣", weight: 0.15, packed: false },
+                { name: "保暖内衣", weight: 0.15, packed: false },
+                { name: "运动鞋", weight: 0.6, packed: false },
+                { name: "拖鞋", weight: 0.2, packed: false },
+                { name: "登山鞋", weight: 0.8, packed: false },
+                { name: "帽子", weight: 0.1, packed: false },
+                { name: "墨镜", weight: 0.05, packed: false },
+                { name: "雨衣", weight: 0.2, packed: false }
+            ],
+            "electronics": [
+                { name: "手机", weight: 0.2, packed: false },
+                { name: "手机充电器", weight: 0.1, packed: false },
+                { name: "充电宝", weight: 0.3, packed: false },
+                { name: "数据线", weight: 0.05, packed: false },
+                { name: "转换插头", weight: 0.15, packed: false },
+                { name: "插线板", weight: 0.3, packed: false },
+                { name: "相机", weight: 0.5, packed: false },
+                { name: "耳机", weight: 0.05, packed: false }
+            ],
+            "medicine": [
+                { name: "感冒药", weight: 0.05, packed: false },
+                { name: "退烧药", weight: 0.05, packed: false },
+                { name: "止泻药", weight: 0.05, packed: false },
+                { name: "创可贴", weight: 0.02, packed: true },
+                { name: "红景天", weight: 0.05, packed: false },
+                { name: "防蚊液", weight: 0.1, packed: false }
+            ],
+            "toiletries": [
+                { name: "牙刷", weight: 0.02, packed: true },
+                { name: "牙膏", weight: 0.1, packed: true },
+                { name: "洗面奶", weight: 0.12, packed: true },
+                { name: "洗发水", weight: 0.15, packed: false },
+                { name: "沐浴露", weight: 0.15, packed: false },
+                { name: "毛巾", weight: 0.15, packed: false },
+                { name: "防晒霜 SPF50+", weight: 0.1, packed: false },
+                { name: "纸巾", weight: 0.1, packed: false }
+            ]
+        };
+
+        let currentCategory = 'documents';
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            
+            if (pageId === 'detail') {
+                loadCategoryItems(currentCategory);
+            }
+        }
+
+        // 选项按钮
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // 分类导航
+        document.querySelectorAll('.category-nav-item').forEach((item, index) => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.category-nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                
+                const categories = ['documents', 'clothing', 'electronics', 'medicine', 'toiletries'];
+                currentCategory = categories[index];
+                loadCategoryItems(currentCategory);
+            });
+        });
+
+        // 加载分类物品
+        function loadCategoryItems(category) {
+            const categoryNames = {
+                'documents': '证件类',
+                'clothing': '衣物类',
+                'electronics': '电子产品',
+                'medicine': '药品类',
+                'toiletries': '洗漱用品'
+            };
+
+            document.getElementById('categoryTitle').textContent = categoryNames[category];
+            
+            const items = itemsDatabase[category];
+            const tbody = document.getElementById('itemsTableBody');
+            tbody.innerHTML = '';
+
+            let packedCount = 0;
+            let totalWeight = 0;
+
+            items.forEach((item, index) => {
+                if (item.packed) packedCount++;
+                totalWeight += item.weight;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="item-checkbox" ${item.packed ? 'checked' : ''} onchange="toggleItem('${category}', ${index})"></td>
+                    <td><div class="item-name">${item.name}</div></td>
+                    <td><div class="item-weight">${(item.weight * 1000).toFixed(0)}g</div></td>
+                    <td><span class="item-status ${item.packed ? 'packed' : 'pending'}">${item.packed ? '已打包' : '待打包'}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('categoryProgress').textContent = `${packedCount}/${items.length}`;
+            document.getElementById('categoryWeight').textContent = `${totalWeight.toFixed(2)}kg`;
+
+            updateOverallProgress();
+        }
+
+        // 切换物品状态
+        function toggleItem(category, index) {
+            itemsDatabase[category][index].packed = !itemsDatabase[category][index].packed;
+            loadCategoryItems(category);
+        }
+
+        // 更新总进度
+        function updateOverallProgress() {
+            let totalPacked = 0;
+            let totalItems = 0;
+            let totalWeight = 0;
+
+            Object.values(itemsDatabase).forEach(items => {
+                items.forEach(item => {
+                    totalItems++;
+                    if (item.packed) totalPacked++;
+                    totalWeight += item.weight;
+                });
+            });
+
+            const packPercent = Math.round((totalPacked / totalItems) * 100);
+            const weightPercent = Math.round((totalWeight / 23) * 100);
+
+            document.querySelector('.stat-progress-fill').style.width = packPercent + '%';
+            document.querySelector('.stat-progress-fill.weight').style.width = Math.min(weightPercent, 100) + '%';
+            document.querySelectorAll('.stat-progress-label span')[1].textContent = `${totalPacked} / ${totalItems} 件`;
+            document.querySelectorAll('.stat-progress-label span')[3].textContent = `${totalWeight.toFixed(1)} / 23 kg`;
+        }
+
+        // 添加物品对话框
+        function showAddItemDialog() {
+            document.getElementById('addItemDialog').classList.add('active');
+            document.getElementById('newItemName').value = '';
+            document.getElementById('newItemWeight').value = '';
+        }
+
+        function hideAddItemDialog() {
+            document.getElementById('addItemDialog').classList.remove('active');
+        }
+
+        function addNewItem() {
+            const name = document.getElementById('newItemName').value.trim();
+            const weight = parseFloat(document.getElementById('newItemWeight').value);
+
+            if (!name || !weight || weight <= 0) {
+                alert('请输入有效的物品名称和重量');
+                return;
+            }
+
+            itemsDatabase[currentCategory].push({
+                name: name,
+                weight: weight,
+                packed: false
+            });
+
+            hideAddItemDialog();
+            loadCategoryItems(currentCategory);
+        }
+
+        // 点击对话框外部关闭
+        document.getElementById('addItemDialog').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideAddItemDialog();
+            }
+        });
+
+        // 初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCategoryItems('documents');
+        });
+    </script>
+</body>
+</html>
