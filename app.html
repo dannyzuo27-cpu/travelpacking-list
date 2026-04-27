@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-            background-color: #a4b9dd;
+            background: linear-gradient(135deg, #96c1dd 0%, #a7b408 100%);
             min-height: 100vh;
             padding: 40px;
         }
@@ -36,7 +36,7 @@
         .auth-title {
             font-size: 32px;
             font-weight: 700;
-            color: #8a5128;
+            color: #e41e71;
             text-align: center;
             margin-bottom: 40px;
         }
@@ -58,8 +58,8 @@
         .auth-btn {
             width: 100%;
             padding: 16px;
-            background: #fbf6e0;
-            color: #8a5128;
+            background: #ffb40f;
+            color: white;
             border: none;
             border-radius: 8px;
             font-size: 18px;
@@ -81,7 +81,7 @@
         }
 
         .auth-switch a {
-            color: #8a5128;
+            color: #e41e71;
             text-decoration: none;
             font-weight: 600;
             cursor: pointer;
@@ -109,7 +109,7 @@
         .logo {
             font-size: 28px;
             font-weight: 700;
-            color: #8a5128;
+            color: #e41e71;
         }
 
         .user-info {
@@ -119,15 +119,15 @@
         }
 
         .username {
-            color: #8a5128;
+            color: #e41e71;
             font-weight: 600;
         }
 
         .logout-btn {
             padding: 10px 20px;
             background: white;
-            color: #8a5128;
-            border: 2px solid #fbf6e0;
+            color: #e41e71;
+            border: 2px solid #ff9191;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
@@ -136,7 +136,8 @@
         }
 
         .logout-btn:hover {
-            background: #fbf6e0;
+            background: #ff9191;
+            color: white;
         }
 
         .nav-buttons {
@@ -146,8 +147,8 @@
 
         .nav-btn {
             padding: 12px 24px;
-            background: #fbf6e0;
-            color: #8a5128;
+            background: #ffb40f;
+            color: white;
             border: none;
             border-radius: 8px;
             font-size: 15px;
@@ -185,7 +186,7 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             cursor: pointer;
             transition: all 0.3s ease;
-            border-top: 4px solid #fbf6e0;
+            border-top: 4px solid #f8e473;
         }
 
         .trip-card:hover {
@@ -194,17 +195,21 @@
         }
 
         .trip-card:nth-child(2n) {
-            border-top-color: #e4c291;
+            border-top-color: #ffb40f;
         }
 
         .trip-card:nth-child(3n) {
-            border-top-color: #8a5128;
+            border-top-color: #e41e71;
+        }
+
+        .trip-card:nth-child(4n) {
+            border-top-color: #ff9191;
         }
 
         .trip-card-title {
             font-size: 24px;
             font-weight: 700;
-            color: #8a5128;
+            color: #e41e71;
             margin-bottom: 12px;
         }
 
@@ -240,7 +245,7 @@
 
         .progress-fill {
             height: 100%;
-            background: #fbf6e0;
+            background: linear-gradient(90deg, #ffb40f 0%, #f8e473 100%);
             transition: width 0.3s ease;
         }
 
@@ -273,7 +278,7 @@
         .form-title {
             font-size: 32px;
             font-weight: 700;
-            color: #8a5128;
+            color: #e41e71;
             margin-bottom: 40px;
             text-align: center;
         }
@@ -286,7 +291,7 @@
             display: block;
             font-size: 16px;
             font-weight: 600;
-            color: #8a5128;
+            color: #e41e71;
             margin-bottom: 12px;
         }
 
@@ -301,7 +306,7 @@
 
         .form-input:focus {
             outline: none;
-            border-color: #fbf6e0;
+            border-color: #ffb40f;
         }
 
         .form-options {
@@ -315,7 +320,7 @@
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             background: white;
-            color: #8a5128;
+            color: #e41e71;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
@@ -323,21 +328,21 @@
         }
 
         .option-btn:hover {
-            border-color: #fbf6e0;
-            background: #fefdfb;
+            border-color: #ffb40f;
+            background: #fffef8;
         }
 
         .option-btn.selected {
-            background: #fbf6e0;
-            color: #8a5128;
-            border-color: #fbf6e0;
+            background: #ffb40f;
+            color: white;
+            border-color: #ffb40f;
         }
 
         .form-submit {
             width: 100%;
             padding: 18px;
-            background: #fbf6e0;
-            color: #8a5128;
+            background: #ffb40f;
+            color: white;
             border: none;
             border-radius: 8px;
             font-size: 18px;
@@ -382,25 +387,29 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: #8a5128;
+            color: #e41e71;
             font-weight: 600;
         }
 
         .category-nav-item:hover {
-            background: #f5f5f5;
+            background: #fff8f0;
         }
 
         .category-nav-item.active {
-            background: #fbf6e0;
-            color: #8a5128;
+            background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
+            color: white;
         }
 
         .category-badge {
-            background: rgba(164, 185, 221, 0.3);
+            background: rgba(248, 228, 115, 0.3);
             padding: 4px 12px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
+        }
+
+        .category-nav-item.active .category-badge {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .detail-content {
@@ -422,13 +431,13 @@
         .detail-title {
             font-size: 32px;
             font-weight: 700;
-            color: #8a5128;
+            color: #e41e71;
         }
 
         .add-item-btn {
             padding: 10px 20px;
-            background: #fbf6e0;
-            color: #8a5128;
+            background: #ffb40f;
+            color: white;
             border: none;
             border-radius: 8px;
             font-size: 14px;
@@ -465,20 +474,20 @@
         }
 
         .items-table tr:hover {
-            background: #fefdfb;
+            background: #fffef8;
         }
 
         .item-checkbox {
             width: 24px;
             height: 24px;
             cursor: pointer;
-            accent-color: #fbf6e0;
+            accent-color: #ffb40f;
         }
 
         .item-name {
             font-size: 16px;
             font-weight: 600;
-            color: #8a5128;
+            color: #e41e71;
         }
 
         .item-weight {
@@ -494,13 +503,13 @@
         }
 
         .item-status.packed {
-            background: #fbf6e0;
-            color: #8a5128;
+            background: #f8e473;
+            color: #666;
         }
 
         .item-status.pending {
-            background: #e4c291;
-            color: #8a5128;
+            background: #ff9191;
+            color: white;
         }
 
         /* 对话框 */
@@ -533,7 +542,7 @@
         .dialog-title {
             font-size: 24px;
             font-weight: 700;
-            color: #8a5128;
+            color: #e41e71;
             margin-bottom: 24px;
         }
 
@@ -548,7 +557,7 @@
 
         .dialog-input:focus {
             outline: none;
-            border-color: #fbf6e0;
+            border-color: #ffb40f;
         }
 
         .dialog-buttons {
@@ -568,8 +577,8 @@
         }
 
         .dialog-btn.primary {
-            background: #fbf6e0;
-            color: #8a5128;
+            background: #ffb40f;
+            color: white;
         }
 
         .dialog-btn.secondary {
@@ -611,7 +620,7 @@
             margin-bottom: 12px;
             font-size: 15px;
             font-weight: 600;
-            color: #8a5128;
+            color: #e41e71;
         }
 
         .stat-progress-bar {
@@ -623,12 +632,12 @@
 
         .stat-progress-fill {
             height: 100%;
-            background: #fbf6e0;
+            background: linear-gradient(90deg, #ffb40f 0%, #f8e473 100%);
             transition: width 0.4s ease;
         }
 
         .stat-progress-fill.weight {
-            background: #e4c291;
+            background: linear-gradient(90deg, #a7b408 0%, #96c1dd 100%);
         }
     </style>
 </head>
