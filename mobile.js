@@ -371,9 +371,10 @@ function displayTripInfo(trip, weather, isEstimated) {
             const day = weather.days[i];
             console.log(`🌡 渲染第${i+1}天: 日期=${day.date}, 最低=${day.tempMin}°, 最高=${day.tempMax}°, 图标=${day.icon}`);
             
-            // 按React组件思路：加scroll-snap
+            // 强制固定宽度，确保超出容器
             const cardHtml = '<div style="' +
-                'min-width: 110px; ' +
+                'width: 120px; ' +        // 改为固定宽度
+                'min-width: 120px; ' +    // 加大到120px
                 'flex-shrink: 0; ' +
                 'scroll-snap-align: start; ' +
                 'background: white; ' +
