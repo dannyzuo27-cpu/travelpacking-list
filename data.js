@@ -67,6 +67,7 @@ const itemsTemplates = {
     "documents": [
         { name: "身份证", weight: 0.05 },
         { name: "护照", weight: 0.1 },
+        { name: "边防证", weight: 0.05 },
         { name: "驾驶证", weight: 0.05 },
         { name: "银行卡", weight: 0.01 },
         { name: "现金", weight: 0.05 }
