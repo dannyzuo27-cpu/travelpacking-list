@@ -5,85 +5,195 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>清理测试数据 - 旅行清单</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #96c1dd 0%, #a7b408 100%);
+            background: linear-gradient(135deg, #f8e473 0%, #ffb40f 50%, #e41e71 100%);
             margin: 0;
             padding: 20px;
         }
+
         .container {
             background: white;
-            border-radius: 16px;
-            padding: 48px;
+            border-radius: 20px;
+            padding: 48px 40px;
             max-width: 500px;
             width: 100%;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .icon {
             text-align: center;
-        }
-        h1 {
-            font-size: 28px;
-            color: #e41e71;
-            margin-bottom: 16px;
-        }
-        .warning {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
-            border-radius: 8px;
-            padding: 16px;
+            font-size: 64px;
             margin-bottom: 24px;
-            color: #856404;
-            font-size: 14px;
-            line-height: 1.6;
+            animation: bounce 2s infinite;
         }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #e41e71;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            font-size: 15px;
+            margin-bottom: 32px;
+        }
+
+        .warning {
+            background: linear-gradient(135deg, #fff8f0 0%, #ffe8e8 100%);
+            border: 2px solid #ff9191;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 32px;
+            color: #e41e71;
+            font-size: 15px;
+            line-height: 1.8;
+            font-weight: 500;
+        }
+
+        .warning strong {
+            font-size: 16px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
         button {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
-            color: white;
+            padding: 18px;
             border: none;
             border-radius: 12px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
             cursor: pointer;
-            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        button:hover {
-            opacity: 0.9;
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
+
+        button.danger {
+            background: linear-gradient(135deg, #ff9191 0%, #e41e71 100%);
+            color: white;
+        }
+
+        button.danger:hover {
+            background: linear-gradient(135deg, #e41e71 0%, #ff9191 100%);
+        }
+
+        button.primary {
+            background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
+            color: white;
+        }
+
+        button.primary:hover {
+            background: linear-gradient(135deg, #f8e473 0%, #ffb40f 100%);
+        }
+
         button.secondary {
-            background: #f0f0f0;
+            background: white;
             color: #666;
+            border: 2px solid #f0f0f0;
+            box-shadow: none;
         }
-        #result {
-            margin-top: 24px;
-            padding: 16px;
+
+        button.secondary:hover {
             background: #f8f9fa;
-            border-radius: 8px;
-            font-size: 14px;
-            line-height: 1.6;
-            text-align: left;
-            display: none;
+            border-color: #e0e0e0;
         }
+
+        #result {
+            margin-top: 32px;
+            padding: 24px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.8;
+            text-align: left;
+            color: #333;
+            display: none;
+            white-space: pre-wrap;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+
         #result.show {
             display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 32px 24px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            button {
+                padding: 16px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🧹 清理测试数据</h1>
+        <div class="icon">🧹</div>
+        <h1>清理测试数据</h1>
+        <div class="subtitle">旅行清单管理工具</div>
+        
         <div class="warning">
-            ⚠️ <strong>警告：</strong>此操作将清空所有账户、清单和物品数据！<br>
-            清空后需要重新注册账号。
+            <strong>⚠️ 操作警告</strong>
+            此操作将清空所有账户、清单和物品数据！<br>
+            清空后需要重新注册账号，数据无法恢复。
         </div>
-        <button onclick="clearAll()">清空所有数据</button>
-        <button class="secondary" onclick="window.location.href='app.html'">返回桌面版</button>
-        <button class="secondary" onclick="window.location.href='mobile.html'">返回手机版</button>
-        <pre id="result"></pre>
+
+        <div class="buttons">
+            <button class="danger" onclick="clearAll()">🗑️ 清空所有数据</button>
+            <button class="primary" onclick="window.location.href='app.html'">💻 返回桌面版</button>
+            <button class="secondary" onclick="window.location.href='mobile.html'">📱 返回手机版</button>
+        </div>
+
+        <div id="result"></div>
     </div>
 
     <script>
@@ -104,12 +214,19 @@
             result.textContent = `✅ 数据已清空！
 
 清理前统计：
-- 用户账号：${beforeData.users.length} 个 (${beforeData.users.join(', ')})
+- 用户账号：${beforeData.users.length} 个 ${beforeData.users.length > 0 ? '(' + beforeData.users.join(', ') + ')' : ''}
 - 旅行清单：${beforeData.trips} 个
 - 物品记录：${beforeData.items} 条
 
 请刷新页面重新注册。`;
             result.classList.add('show');
+            
+            // 3秒后自动跳转到登录页
+            setTimeout(() => {
+                if (confirm('数据已清空！是否跳转到登录页？')) {
+                    window.location.href = 'app.html';
+                }
+            }, 3000);
         }
     </script>
 </body>
