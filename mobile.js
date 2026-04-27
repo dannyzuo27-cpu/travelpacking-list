@@ -918,11 +918,13 @@ function loadTrips() {
         
         const isCollab = trip.userId !== currentUser;
         const collabTag = isCollab ? '<div style="display: inline-block; background: #a4ceb7; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">协作</div>' : '';
+        const creatorInfo = `<div style="font-size: 12px; color: #999; margin-top: 4px;">创建人: ${trip.userId}</div>`;
 
         return `
             <div class="trip-card" onclick="openTrip('${trip.id}')">
                 <div class="trip-card-title">${trip.title}${collabTag}</div>
                 <div class="trip-card-meta">${trip.startDate} - ${trip.endDate} · ${getTripTypeLabel(trip.type)}</div>
+                ${creatorInfo}
                 <div class="trip-progress">
                     <div class="trip-progress-label">
                         <span>打包进度</span>
@@ -946,10 +948,53 @@ function loadTrips() {
     }).join('');
 }
 
+// 快速加入协作
+function showJoinDialog() {
+    document.getElementById('quickJoinDialog').classList.add('active');
+    document.getElementById('quickJoinCode').value = '';
+}
+
+function hideQuickJoinDialog() {
+    document.getElementById('quickJoinDialog').classList.remove('active');
+}
+
+function quickJoinCollab() {
+    const code = document.getElementById('quickJoinCode').value.trim().toUpperCase();
+    
+    if (!code || code.length !== 6) {
+        alert('请输入6位邀请码');
+        return;
+    }
+
+    // 查找对应的清单
+    const trips = getTripsData();
+    const targetTrip = trips.find(t => generateInviteCode(t.id) === code);
+    
+    if (!targetTrip) {
+        alert('邀请码无效或清单不存在');
+        return;
+    }
+
+    // 添加协作关系
+    addCollabMember(targetTrip.id, currentUser);
+    
+    alert('加入成功！');
+    hideQuickJoinDialog();
+    
+    // 重新加载清单列表
+    loadTrips();
+}
+
 // 对话框关闭事件
 document.getElementById('collabDialog').addEventListener('click', function(e) {
     if (e.target === this) {
         hideCollabDialog();
+    }
+});
+
+document.getElementById('quickJoinDialog').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideQuickJoinDialog();
     }
 });
 

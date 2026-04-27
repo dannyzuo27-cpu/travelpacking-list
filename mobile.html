@@ -906,6 +906,7 @@
             <div class="action-buttons">
                 <button class="action-btn shopping" onclick="showPage('shoppingPage')">🛒 购物清单</button>
                 <button class="action-btn create" onclick="showPage('createPage')">＋ 创建新清单</button>
+                <button class="action-btn join" onclick="showJoinDialog()">🔗 加入协作</button>
             </div>
 
             <div class="trip-list" id="tripList"></div>
@@ -1076,6 +1077,21 @@
 
             <div class="dialog-buttons" style="margin-top: 20px;">
                 <button class="dialog-btn secondary" onclick="hideCollabDialog()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快速加入协作对话框 -->
+    <div class="dialog-overlay" id="quickJoinDialog">
+        <div class="dialog-box">
+            <div class="dialog-title">加入协作清单</div>
+            <div style="padding: 20px;">
+                <div style="font-size: 14px; color: #666; margin-bottom: 12px;">输入6位邀请码</div>
+                <input type="text" class="dialog-input" id="quickJoinCode" placeholder="例如: ABC123" maxlength="6" style="text-transform: uppercase;">
+            </div>
+            <div class="dialog-buttons">
+                <button class="dialog-btn secondary" onclick="hideQuickJoinDialog()">取消</button>
+                <button class="dialog-btn primary" onclick="quickJoinCollab()">加入</button>
             </div>
         </div>
     </div>
