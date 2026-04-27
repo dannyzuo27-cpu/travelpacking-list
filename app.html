@@ -512,6 +512,19 @@
             color: white;
         }
 
+        .buy-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #e41e71;
+        }
+
+        .buy-label {
+            font-size: 13px;
+            color: #e41e71;
+            font-weight: 600;
+        }
+
         /* 对话框 */
         .dialog-overlay {
             display: none;
@@ -737,6 +750,14 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label">需要化妆品清单吗？</label>
+                    <div class="form-options" id="genderOptions">
+                        <button class="option-btn" data-value="yes">需要</button>
+                        <button class="option-btn" data-value="no">不需要</button>
+                    </div>
+                </div>
+
                 <button class="form-submit" onclick="createTrip()">生成清单</button>
             </div>
         </div>
@@ -761,6 +782,7 @@
                                 <th style="width: 60px;"></th>
                                 <th>物品名称</th>
                                 <th>重量</th>
+                                <th>待购买</th>
                                 <th>状态</th>
                             </tr>
                         </thead>

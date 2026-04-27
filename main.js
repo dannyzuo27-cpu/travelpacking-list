@@ -5,6 +5,17 @@ let currentCategory = 'documents';
 
 // ===== 用户认证 =====
 
+// 简单的密码哈希（实际项目应该用更安全的方法）
+function hashPassword(password) {
+    let hash = 0;
+    for (let i = 0; i < password.length; i++) {
+        const char = password.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return hash.toString(36);
+}
+
 function register() {
     const username = document.getElementById('registerUsername').value.trim();
     const password = document.getElementById('registerPassword').value;
@@ -35,7 +46,10 @@ function register() {
         return;
     }
 
-    users[username] = { password, createdAt: new Date().toISOString() };
+    users[username] = { 
+        passwordHash: hashPassword(password), 
+        createdAt: new Date().toISOString() 
+    };
     localStorage.setItem('users', JSON.stringify(users));
 
     alert('注册成功！');
@@ -56,7 +70,7 @@ function login() {
         return;
     }
 
-    if (users[username].password !== password) {
+    if (users[username].passwordHash !== hashPassword(password)) {
         errorEl.textContent = '密码错误';
         return;
     }
@@ -155,8 +169,9 @@ function createTrip() {
     const endDate = document.getElementById('tripEndDate').value;
     const typeBtn = document.querySelector('#tripTypeOptions .option-btn.selected');
     const luggageBtn = document.querySelector('#luggageOptions .option-btn.selected');
+    const genderBtn = document.querySelector('#genderOptions .option-btn.selected');
 
-    if (!title || !destination || !startDate || !endDate || !typeBtn || !luggageBtn) {
+    if (!title || !destination || !startDate || !endDate || !typeBtn || !luggageBtn || !genderBtn) {
         alert('请填写完整信息');
         return;
     }
@@ -171,6 +186,7 @@ function createTrip() {
         endDate,
         type: typeBtn.dataset.value,
         maxWeight: parseFloat(luggageBtn.dataset.value),
+        includeMakeup: genderBtn.dataset.value === 'yes',
         createdAt: new Date().toISOString()
     };
 
@@ -179,7 +195,7 @@ function createTrip() {
     saveTripsData(trips);
 
     // 生成初始物品
-    generateInitialItems(tripId);
+    generateInitialItems(tripId, trip.includeMakeup);
 
     // 清空表单
     document.getElementById('tripTitle').value = '';
@@ -192,19 +208,24 @@ function createTrip() {
     openTrip(tripId);
 }
 
-function generateInitialItems(tripId) {
+function generateInitialItems(tripId, includeMakeup) {
     const items = [];
     
     categories.forEach(cat => {
+        // 如果是化妆品分类且用户不需要，跳过
+        if (cat.id === 'makeup' && !includeMakeup) return;
+        
         const templates = itemsTemplates[cat.id] || [];
-        templates.forEach(template => {
+        templates.forEach((template, index) => {
             items.push({
-                id: 'item_' + Date.now() + '_' + Math.random(),
+                id: 'item_' + Date.now() + '_' + index,
                 tripId,
                 category: cat.id,
                 name: template.name,
                 weight: template.weight,
-                packed: false
+                packed: false,
+                needToBuy: false,
+                bought: false
             });
         });
     });
@@ -231,15 +252,23 @@ function openTrip(tripId) {
 }
 
 function renderCategories() {
-    const html = categories.map(cat => {
-        const stats = getCategoryStats(currentTripId, cat.id);
-        return `
-            <div class="category-nav-item ${cat.id === currentCategory ? 'active' : ''}" onclick="switchCategory('${cat.id}')">
-                <span>${cat.icon} ${cat.name}</span>
-                <span class="category-badge">${stats.packed}/${stats.total}</span>
-            </div>
-        `;
-    }).join('');
+    const trip = getTripsData().find(t => t.id === currentTripId);
+    
+    const html = categories
+        .filter(cat => {
+            // 如果是化妆品分类且清单不包含化妆品，过滤掉
+            if (cat.id === 'makeup' && !trip.includeMakeup) return false;
+            return true;
+        })
+        .map(cat => {
+            const stats = getCategoryStats(currentTripId, cat.id);
+            return `
+                <div class="category-nav-item ${cat.id === currentCategory ? 'active' : ''}" onclick="switchCategory('${cat.id}')">
+                    <span>${cat.icon} ${cat.name}</span>
+                    <span class="category-badge">${stats.packed}/${stats.total}</span>
+                </div>
+            `;
+        }).join('');
     
     document.getElementById('categoriesList').innerHTML = html;
 }
@@ -264,6 +293,9 @@ function loadCategoryItems() {
             <td><input type="checkbox" class="item-checkbox" ${item.packed ? 'checked' : ''} onchange="toggleItem('${item.id}')"></td>
             <td><div class="item-name">${item.name}</div></td>
             <td><div class="item-weight">${(item.weight * 1000).toFixed(0)}g</div></td>
+            <td>
+                <input type="checkbox" class="buy-checkbox" ${item.needToBuy ? 'checked' : ''} onchange="toggleBuy('${item.id}')">
+            </td>
             <td><span class="item-status ${item.packed ? 'packed' : 'pending'}">${item.packed ? '已打包' : '待打包'}</span></td>
         </tr>
     `).join('');
@@ -278,6 +310,15 @@ function toggleItem(itemId) {
         item.packed = !item.packed;
         saveItemsData(items);
         loadCategoryItems();
+    }
+}
+
+function toggleBuy(itemId) {
+    const items = getItemsData();
+    const item = items.find(i => i.id === itemId);
+    if (item) {
+        item.needToBuy = !item.needToBuy;
+        saveItemsData(items);
     }
 }
 
@@ -309,7 +350,9 @@ function addNewItem() {
         category: currentCategory,
         name,
         weight,
-        packed: false
+        packed: false,
+        needToBuy: false,
+        bought: false
     });
 
     saveItemsData(items);
