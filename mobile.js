@@ -255,11 +255,61 @@ function openTrip(tripId) {
 
     document.getElementById('detailTitle').textContent = trip.title;
     
+    // 渲染旅行信息卡片
+    renderTripInfo(trip);
+    
     renderCategories();
     currentCategory = 'documents';
     loadCategoryItems();
     
     showPage('detailPage');
+}
+
+// 渲染旅行信息
+function renderTripInfo(trip) {
+    // 计算天气（简化版，实际应该调用天气API）
+    const weather = getWeatherInfo(trip.destination, trip.startDate);
+    
+    const html = `
+        <div class="trip-info-header">
+            <div class="trip-info-main">
+                <div class="trip-info-destination">📍 ${trip.destination}</div>
+                <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
+            </div>
+            <div class="trip-info-weather">
+                <div class="trip-info-temp">${weather.temp}°</div>
+                <div class="trip-info-desc">${weather.desc}</div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('tripInfoCard').innerHTML = html;
+}
+
+// 简化的天气信息（实际应该调用API）
+function getWeatherInfo(destination, date) {
+    const month = new Date(date).getMonth() + 1;
+    
+    // 根据月份和目的地简单估算
+    const weathers = {
+        spring: { temp: '18-25', desc: '☀️ 晴朗' },
+        summer: { temp: '25-35', desc: '🌤 炎热' },
+        autumn: { temp: '15-22', desc: '🍂 凉爽' },
+        winter: { temp: '0-10', desc: '❄️ 寒冷' }
+    };
+    
+    if (month >= 3 && month <= 5) return weathers.spring;
+    if (month >= 6 && month <= 8) return weathers.summer;
+    if (month >= 9 && month <= 11) return weathers.autumn;
+    return weathers.winter;
+}
+
+// 格式化日期
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${month}月${day}日`;
 }
 
 // 渲染分类标签

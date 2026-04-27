@@ -354,6 +354,54 @@
             padding-bottom: 100px;
         }
 
+        .trip-info-card {
+            margin: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .trip-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .trip-info-main {
+            flex: 1;
+        }
+
+        .trip-info-destination {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e41e71;
+            margin-bottom: 6px;
+        }
+
+        .trip-info-dates {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .trip-info-weather {
+            text-align: right;
+        }
+
+        .trip-info-temp {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffb40f;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .trip-info-desc {
+            font-size: 13px;
+            color: #999;
+        }
+
         .categories-nav {
             position: sticky;
             top: 64px;
@@ -447,9 +495,16 @@
 
         .item-meta {
             display: flex;
-            gap: 12px;
+            gap: 16px;
             font-size: 13px;
             color: #999;
+            align-items: center;
+        }
+        
+        .item-meta > span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .item-status {
@@ -794,6 +849,8 @@
             <div class="header-title" id="detailTitle"></div>
             <div style="width: 48px;"></div>
         </div>
+
+        <div class="trip-info-card" id="tripInfoCard"></div>
 
         <div class="categories-nav" id="categoriesNav"></div>
 

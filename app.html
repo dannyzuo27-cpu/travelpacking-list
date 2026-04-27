@@ -362,6 +362,53 @@
         }
 
         /* 详情页 */
+        .trip-info-banner {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .trip-info-left {
+            flex: 1;
+        }
+
+        .trip-destination {
+            font-size: 28px;
+            font-weight: 700;
+            color: #e41e71;
+            margin-bottom: 12px;
+        }
+
+        .trip-dates {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .trip-weather {
+            text-align: right;
+            padding-left: 32px;
+        }
+
+        .trip-temp {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffb40f 0%, #f8e473 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .trip-weather-desc {
+            font-size: 16px;
+            color: #999;
+        }
+
         .detail-container {
             display: grid;
             grid-template-columns: 280px 1fr;
@@ -839,6 +886,8 @@
                 <div class="logo">🧳 <span id="detailTripTitle"></span></div>
                 <button class="nav-btn" onclick="showPage('homePage')">← 返回</button>
             </div>
+
+            <div class="trip-info-banner" id="tripInfoBanner"></div>
 
             <div class="detail-container">
                 <div class="categories-sidebar" id="categoriesList"></div>

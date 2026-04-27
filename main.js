@@ -271,6 +271,9 @@ function openTrip(tripId) {
 
     document.getElementById('detailTripTitle').textContent = trip.title;
     
+    // 渲染旅行信息
+    renderTripInfoBanner(trip);
+    
     // 渲染分类列表
     renderCategories();
     
@@ -279,6 +282,46 @@ function openTrip(tripId) {
     loadCategoryItems();
     
     showPage('detailPage');
+}
+
+function renderTripInfoBanner(trip) {
+    const weather = getWeatherInfo(trip.destination, trip.startDate);
+    
+    const html = `
+        <div class="trip-info-left">
+            <div class="trip-destination">📍 ${trip.destination}</div>
+            <div class="trip-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
+        </div>
+        <div class="trip-weather">
+            <div class="trip-temp">${weather.temp}°</div>
+            <div class="trip-weather-desc">${weather.desc}</div>
+        </div>
+    `;
+    
+    document.getElementById('tripInfoBanner').innerHTML = html;
+}
+
+function getWeatherInfo(destination, date) {
+    const month = new Date(date).getMonth() + 1;
+    
+    const weathers = {
+        spring: { temp: '18-25', desc: '☀️ 晴朗' },
+        summer: { temp: '25-35', desc: '🌤 炎热' },
+        autumn: { temp: '15-22', desc: '🍂 凉爽' },
+        winter: { temp: '0-10', desc: '❄️ 寒冷' }
+    };
+    
+    if (month >= 3 && month <= 5) return weathers.spring;
+    if (month >= 6 && month <= 8) return weathers.summer;
+    if (month >= 9 && month <= 11) return weathers.autumn;
+    return weathers.winter;
+}
+
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${month}月${day}日`;
 }
 
 function renderCategories() {
