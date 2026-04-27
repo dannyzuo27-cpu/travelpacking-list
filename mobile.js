@@ -317,15 +317,16 @@ async function renderTripInfo(trip) {
         console.log('🔄 开始加载真实天气...');
         const weather = await getWeather(trip.destination, trip.startDate, trip.endDate);
         
-        console.log('✅ 真实天气加载成功，天数:', weather.days ? weather.days.length : 0);
+        console.log('✅ 真实天气加载成功');
+        console.log('完整天气对象:', JSON.stringify(weather, null, 2));
+        
         if (weather.days && weather.days.length > 0) {
-            console.log('第1天真实温度:', weather.days[0].tempMin, '-', weather.days[0].tempMax);
-            if (weather.days[1]) {
-                console.log('第2天真实温度:', weather.days[1].tempMin, '-', weather.days[1].tempMax);
-            }
-            if (weather.days[2]) {
-                console.log('第3天真实温度:', weather.days[2].tempMin, '-', weather.days[2].tempMax);
-            }
+            console.log('=== 每天的天气数据 ===');
+            weather.days.forEach((day, index) => {
+                console.log(`第${index+1}天 ${day.date}: ${day.tempMin}° - ${day.tempMax}° ${day.icon}`);
+            });
+        } else {
+            console.log('❌ weather.days不存在或为空!');
         }
         
         saveWeatherToTrip(trip.id, weather);
@@ -361,13 +362,14 @@ function displayTripInfo(trip, weather, isEstimated) {
     
     // 强制检查 days 是否存在且有内容
     if (weather && weather.days && weather.days.length > 0) {
-        console.log('✅ 使用多天天气显示，天数:', weather.days.length);
+        console.log('====== 开始渲染多天天气 ======');
+        console.log('总天数:', weather.days.length);
         
         // 手动构建HTML，避免箭头函数兼容性问题
         const dayElements = [];
         for (let i = 0; i < weather.days.length; i++) {
             const day = weather.days[i];
-            console.log(`第${i+1}天:`, day.date, day.tempMin, day.tempMax, day.icon);
+            console.log(`🌡 渲染第${i+1}天: 日期=${day.date}, 最低=${day.tempMin}°, 最高=${day.tempMax}°, 图标=${day.icon}`);
             
             const dayHtml = '<div class="weather-day" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 6px 0; border-bottom: 1px solid #f0f0f0;">' +
                 '<span class="weather-day-date" style="font-weight: 600;">' + formatMonthDay(day.date) + ' ' + day.icon + '</span>' +
@@ -375,8 +377,10 @@ function displayTripInfo(trip, weather, isEstimated) {
                 '</div>';
             
             dayElements.push(dayHtml);
+            console.log(`✅ HTML已生成: ${dayHtml.substring(0, 100)}...`);
         }
         weatherHtml = dayElements.join('');
+        console.log('====== 天气HTML拼接完成 ======');
     } else {
         console.log('❌ 使用单温度显示');
         weatherHtml = '<div class="trip-info-temp">' + weather.tempAvg + '°' + estimatedTag + '</div>';
