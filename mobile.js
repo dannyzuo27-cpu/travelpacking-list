@@ -415,13 +415,17 @@ function displayTripInfo(trip, weather, isEstimated) {
             <div style="
                 display: flex;
                 overflow-x: scroll;
+                overflow-y: hidden;
                 gap: 12px;
                 scroll-snap-type: x mandatory;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none;
+                -ms-overflow-style: none;
                 margin: 0 -20px;
                 padding: 0 20px;
-            ">
+                width: calc(100% + 40px);
+                max-width: calc(100% + 40px);
+            " class="weather-scroll">
                 ${weatherCardsHtml}
             </div>
         </div>
