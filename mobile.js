@@ -395,7 +395,9 @@ function displayTripInfo(trip, weather, isEstimated) {
             <div class="trip-info-destination">📍 ${trip.destination}</div>
             <div class="trip-info-dates">🗓 ${formatDate(trip.startDate)} - ${formatDate(trip.endDate)}</div>
         </div>
-        ${weatherHtml}
+        <div style="width: 100%; position: relative; z-index: 1;">
+            ${weatherHtml}
+        </div>
     `;
     
     document.getElementById('tripInfoCard').innerHTML = html;
