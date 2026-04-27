@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>旅行清单 - 移动版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background: linear-gradient(135deg, #f7e8c9 0%, #ffbdb9 40%, #f17172 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* 登录注册页面 */
+        .auth-container {
+            padding: 60px 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-logo {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .auth-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            padding: 32px 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: #a4ceb7;
+            background: white;
+            box-shadow: 0 4px 12px rgba(164, 206, 183, 0.1);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #a4ceb7 0%, #cee9dc 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 20px rgba(164, 206, 183, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .auth-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 12px rgba(164, 206, 183, 0.3);
+        }
+
+        .auth-switch {
+            text-align: center;
+            color: #666;
+            font-size: 15px;
+            padding: 16px 0;
+        }
+
+        .auth-switch a {
+            color: #f17172;
+            font-weight: 600;
+        }
+
+        .auth-error {
+            color: #f17172;
+            font-size: 14px;
+            margin-bottom: 16px;
+            text-align: center;
+            padding: 12px;
+            background: linear-gradient(135deg, #fff8f0 0%, #ffece8 100%);
+            border: 2px solid #ffbdb9;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        /* 页面切换 */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* 顶部栏 */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f17172;
+        }
+
+        .header-btn {
+            padding: 8px 16px;
+            background: #a4ceb7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .header-btn.secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        /* 首页 */
+        .home-container {
+            padding: 20px;
+        }
+
+        .user-info {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .username {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f17172;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: white;
+            color: #f17172;
+            border: 2px solid #ffbdb9;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .action-btn {
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+
+        .action-btn.create {
+            background: linear-gradient(135deg, #a4ceb7 0%, #cee9dc 100%);
+            color: white;
+        }
+
+        .action-btn.shopping {
+            background: white;
+            color: #f17172;
+        }
+
+        .trip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .trip-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #a4ceb7;
+        }
+
+        .trip-card:nth-child(2n) {
+            border-left-color: #c09f7e;
+        }
+
+        .trip-card:nth-child(3n) {
+            border-left-color: #f17172;
+        }
+
+        .trip-card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f17172;
+            margin-bottom: 8px;
+        }
+
+        .trip-card-meta {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 16px;
+        }
+
+        .trip-progress {
+            margin-bottom: 12px;
+        }
+
+        .trip-progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .trip-progress-bar {
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .trip-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #a4ceb7 0%, #cee9dc 100%);
+            transition: width 0.3s ease;
+        }
+
+        .trip-progress-fill.weight {
+            background: linear-gradient(90deg, #c09f7e 0%, #f7e8c9 100%);
+        }
+
+        /* 创建表单 */
+        .form-container {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f17172;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #a4ceb7;
+            background: white;
+        }
+
+        .form-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .form-options.three-col {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .option-btn {
+            padding: 14px 12px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            background: white;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .option-btn.selected {
+            background: linear-gradient(135deg, #a4ceb7 0%, #cee9dc 100%);
+            color: white;
+            border-color: #a4ceb7;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #a4ceb7 0%, #cee9dc 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 24px;
+            box-shadow: 0 4px 12px rgba(164, 206, 183, 0.3);
+        }
+
+        /* 详情页 */
+        .detail-container {
+            padding-bottom: 100px;
+        }
+
+        .trip-info-card {
+            margin: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .trip-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .trip-info-main {
+            flex: 1;
+        }
+
+        .trip-info-destination {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f17172;
+            margin-bottom: 6px;
+        }
+
+        .trip-info-dates {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .trip-info-weather {
+            text-align: right;
+            min-width: 140px; flex-shrink: 0;
+        }
+
+        .trip-info-temp {
+            font-size: 32px;
+            font-weight: 700;
+            color: #c09f7e;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .trip-info-desc {
+            font-size: 14px;
+            color: #999;
+            line-height: 1.4;
+        }
+
+        .weather-day {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .weather-day:last-child {
+            margin-bottom: 0;
+        }
+
+        .weather-day-date {
+            font-weight: 600;
+        }
+
+        .weather-day-temp {
+            color: #c09f7e;
+            font-weight: 700;
+        }
+
+        .categories-nav {
+            position: sticky;
+            top: 64px;
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            white-space: nowrap;
+            z-index: 50;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .categories-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tab {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-right: 12px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .category-tab.active {
+            background: linear-gradient(135deg, #a4ceb7 0%, #cee9dc 100%);
+            color: white;
+        }
+
+        .items-container {
+            padding: 20px;
+        }
+
+        .items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .items-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f17172;
+        }
+
+        .add-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #a4ceb7 0%, #cee9dc 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 32px;
+            line-height: 40px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(164, 206, 183, 0.3);
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .item-checkbox {
+            width: 28px;
+            height: 28px;
+            accent-color: #a4ceb7;
+            flex-shrink: 0;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .item-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: #999;
+            align-items: center;
+        }
+        
+        .item-meta > span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .item-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .item-status.packed {
+            background: #cee9dc;
+            color: #666;
+        }
+
+        .item-status.pending {
+            background: #ff9191;
+            color: white;
+        }
+
+        .packed-by {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .packed-by-name {
+            color: #a4ceb7;
+            font-weight: 600;
+        }
+
+        .buy-checkbox {
+            width: 24px;
+            height: 24px;
+            accent-color: #f17172;
+            flex-shrink: 0;
+        }
+
+        /* 底部统计 */
+        .bottom-stats {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 100;
+        }
+
+        .bottom-stats.active {
+            display: block;
+        }
+
+        .stat-row {
+            margin-bottom: 12px;
+        }
+
+        .stat-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: #f17172;
+            margin-bottom: 6px;
+        }
+
+        .stat-bar {
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .stat-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #a4ceb7 0%, #cee9dc 100%);
+            transition: width 0.3s ease;
+        }
+
+        .stat-fill.weight {
+            background: linear-gradient(90deg, #a7b408 0%, #96c1dd 100%);
+        }
+
+        /* 对话框 */
+        .dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .dialog-overlay.active {
+            display: flex;
+        }
+
+        .dialog-box {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .dialog-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f17172;
+            margin-bottom: 20px;
+        }
+
+        .dialog-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .dialog-input:focus {
+            outline: none;
+            border-color: #a4ceb7;
+        }
+
+        .dialog-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .dialog-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .dialog-btn.primary {
+            background: linear-gradient(135deg, #a4ceb7 0%, #cee9dc 100%);
+            color: white;
+        }
+
+        .dialog-btn.secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            margin-bottom: 24px;
+            opacity: 0.9;
+        }
+
+        /* 购物清单 */
+        .shopping-container {
+            padding: 20px;
+        }
+
+        .shopping-group {
+            margin-bottom: 24px;
+        }
+
+        .shopping-group-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f17172;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .shopping-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .shopping-checkbox {
+            width: 24px;
+            height: 24px;
+            accent-color: #a4ceb7;
+        }
+
+        .shopping-name {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .shopping-weight {
+            font-size: 13px;
+            color: #999;
+        }
+
+        /* 协作功能 */
+        .collab-banner {
+            margin: 20px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #cee9dc 0%, #a4ceb7 100%);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .collab-info {
+            flex: 1;
+        }
+
+        .collab-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .collab-members {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .collab-btn {
+            padding: 8px 16px;
+            background: white;
+            color: #a4ceb7;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .collab-dialog {
+            padding: 24px;
+        }
+
+        .invite-code {
+            background: #f5f5f5;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .invite-code-text {
+            font-size: 32px;
+            font-weight: 700;
+            color: #f17172;
+            letter-spacing: 4px;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .members-list {
+            margin-top: 16px;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .member-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #a4ceb7, #cee9dc);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            margin-right: 12px;
+        }
+
+        .member-name {
+            flex: 1;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .member-role {
+            font-size: 14px;
+            color: #999;
+            padding: 4px 8px;
+            background: white;
+            border-radius: 4px;
+        }
+        .join-collab-card {
+            margin: 0 20px 20px;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .join-collab-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+        }
+
+        .join-collab-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #a4ceb7, #cee9dc);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .join-collab-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .join-collab-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .join-collab-desc {
+            font-size: 13px;
+            color: #999;
+            line-height: 1.4;
+        }
+
+        .join-collab-arrow {
+        .weather-scroll-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .weather-scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .weather-cards {
+            display: flex;
+            gap: 12px;
+            padding: 4px 0;
+        }
+
+        .weather-card {
+            flex-shrink: 0;
+            width: 100px;
+            background: linear-gradient(135deg, #a4ceb7, #cee9dc);
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            color: white;
+        }
+
+        .weather-card-date {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .weather-card-icon {
+            font-size: 32px;
+            margin: 8px 0;
+        }
+
+        .weather-card-temp {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .weather-loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+            font-size: 28px;
+            color: #ddd;
+            font-weight: 300;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- 登录页 -->
+    <div class="page active" id="loginPage">
+        <div class="auth-container">
+            <div class="auth-logo">🧳</div>
+            <div class="auth-title">旅行清单</div>
+            <div class="auth-card">
+                <div class="auth-error" id="loginError" style="display: none;"></div>
+                <input type="text" class="auth-input" id="loginUsername" placeholder="用户名">
+                <input type="password" class="auth-input" id="loginPassword" placeholder="密码">
+                <button class="auth-btn" onclick="login()">登录</button>
+                <div class="auth-switch">
+                    还没有账号？<a onclick="showPage('registerPage')">立即注册</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册页 -->
+    <div class="page" id="registerPage">
+        <div class="auth-container">
+            <div class="auth-logo">🧳</div>
+            <div class="auth-title">注册账号</div>
+            <div class="auth-card">
+                <div class="auth-error" id="registerError" style="display: none;"></div>
+                <input type="text" class="auth-input" id="registerUsername" placeholder="用户名（4-20个字符）">
+                <input type="password" class="auth-input" id="registerPassword" placeholder="密码（至少6个字符）">
+                <input type="password" class="auth-input" id="registerConfirm" placeholder="确认密码">
+                <button class="auth-btn" onclick="register()">注册</button>
+                <div class="auth-switch">
+                    已有账号？<a onclick="showPage('loginPage')">立即登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 首页 -->
+    <div class="page" id="homePage">
+        <div class="header">
+            <div class="header-title">🧳 我的清单</div>
+        </div>
+        
+        <div class="home-container">
+            <div class="user-info">
+                <span class="username" id="currentUser"></span>
+                <button class="logout-btn" onclick="logout()">退出</button>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn shopping" onclick="showPage('shoppingPage')">🛒 购物清单</button>
+                <button class="action-btn create" onclick="showPage('createPage')">＋ 创建新清单</button>
+            </div>
+            
+            <div class="join-collab-card" onclick="showJoinDialog()">
+                <div class="join-collab-icon">🔗</div>
+                <div class="join-collab-content">
+                    <div class="join-collab-title">加入协作清单</div>
+                    <div class="join-collab-desc">输入邀请码，与同行的人一起打包</div>
+                </div>
+                <div class="join-collab-arrow">›</div>
+            </div>
+
+            <div class="trip-list" id="tripList"></div>
+        </div>
+    </div>
+
+    <!-- 创建页 -->
+    <div class="page" id="createPage">
+        <div class="header">
+            <button class="header-btn secondary" onclick="showPage('homePage')">← 返回</button>
+            <div class="header-title">创建清单</div>
+            <div style="width: 48px;"></div>
+        </div>
+
+        <div class="form-container">
+            <div class="form-group">
+                <label class="form-label">清单标题</label>
+                <input type="text" class="form-input" id="tripTitle" placeholder="例如：西藏6日游">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">目的地</label>
+                <input type="text" class="form-input" id="tripDestination" placeholder="输入目的地">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">出发日期</label>
+                <input type="date" class="form-input" id="tripStartDate">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">返回日期</label>
+                <input type="date" class="form-input" id="tripEndDate">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">旅行类型</label>
+                <div class="form-options three-col" id="tripTypeOptions">
+                    <button class="option-btn" data-value="vacation">度假</button>
+                    <button class="option-btn" data-value="self_drive">自驾</button>
+                    <button class="option-btn" data-value="hiking">徒步</button>
+                    <button class="option-btn" data-value="skiing">滑雪</button>
+                    <button class="option-btn" data-value="camping">露营</button>
+                    <button class="option-btn" data-value="business">出差</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">行李限制</label>
+                <div class="form-options three-col" id="luggageOptions">
+                    <button class="option-btn" data-value="7">7kg</button>
+                    <button class="option-btn" data-value="23">23kg</button>
+                    <button class="option-btn" data-value="999">无限制</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">需要化妆品清单吗？</label>
+                <div class="form-options" id="genderOptions">
+                    <button class="option-btn" data-value="yes">需要</button>
+                    <button class="option-btn" data-value="no">不需要</button>
+                </div>
+            </div>
+
+            <button class="form-submit" onclick="createTrip()">生成清单</button>
+        </div>
+    </div>
+
+    <!-- 详情页 -->
+    <div class="page" id="detailPage">
+        <div class="header">
+            <button class="header-btn secondary" onclick="showPage('homePage')">← 返回</button>
+            <div class="header-title" id="detailTitle"></div>
+            <button class="header-btn" onclick="showCollabDialog()">👥</button>
+        </div>
+
+        <div class="trip-info-card" id="tripInfoCard"></div>
+        <div class="collab-banner" id="collabBanner" style="display: none;">
+            <div class="collab-info">
+                <div class="collab-title">👥 多人协作中</div>
+                <div class="collab-members" id="collabMembers">与 1 人协作</div>
+            </div>
+            <button class="collab-btn" onclick="showCollabDialog()">管理</button>
+        </div>
+
+        <div class="categories-nav" id="categoriesNav"></div>
+
+        <div class="items-container">
+            <div class="items-header">
+                <div class="items-title" id="categoryTitle"></div>
+                <button class="add-btn" onclick="showAddItemDialog()">+</button>
+            </div>
+            <div id="itemsList"></div>
+        </div>
+    </div>
+
+    <!-- 购物清单页 -->
+    <div class="page" id="shoppingPage">
+        <div class="header">
+            <button class="header-btn secondary" onclick="showPage('homePage')">← 返回</button>
+            <div class="header-title">🛒 购物清单</div>
+            <div style="width: 48px;"></div>
+        </div>
+
+        <div class="shopping-container" id="shoppingContainer"></div>
+    </div>
+
+    <!-- 底部统计 -->
+    <div class="bottom-stats" id="bottomStats">
+        <div class="stat-row">
+            <div class="stat-label">
+                <span>打包进度</span>
+                <span id="packProgress">0 / 0</span>
+            </div>
+            <div class="stat-bar">
+                <div class="stat-fill" id="packBar"></div>
+            </div>
+        </div>
+        <div class="stat-row">
+            <div class="stat-label">
+                <span>行李重量</span>
+                <span id="weightProgress">0 kg</span>
+            </div>
+            <div class="stat-bar">
+                <div class="stat-fill weight" id="weightBar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加物品对话框 -->
+    <div class="dialog-overlay" id="addItemDialog">
+        <div class="dialog-box">
+            <div class="dialog-title">添加新物品</div>
+            <input type="text" class="dialog-input" id="newItemName" placeholder="物品名称">
+            <input type="number" class="dialog-input" id="newItemWeight" placeholder="重量(kg)" step="0.01">
+            <div class="dialog-buttons">
+                <button class="dialog-btn secondary" onclick="hideAddItemDialog()">取消</button>
+                <button class="dialog-btn primary" onclick="addNewItem()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 协作对话框 -->
+    <div class="dialog-overlay" id="collabDialog">
+        <div class="dialog-box">
+            <div class="dialog-title">多人协作</div>
+            
+            <div class="collab-dialog">
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 8px;">邀请码</div>
+                    <div class="invite-code">
+                        <div class="invite-code-text" id="inviteCode">加载中...</div>
+                    </div>
+                    <div style="font-size: 13px; color: #999; text-align: center;">分享此邀请码给同行的人</div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 8px;">或输入邀请码加入</div>
+                    <input type="text" class="dialog-input" id="joinCode" placeholder="输入6位邀请码">
+                    <button class="dialog-btn primary" style="width: 100%;" onclick="joinCollab()">加入协作</button>
+                </div>
+
+                <div class="members-list">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 12px;">协作成员 (<span id="memberCount">1</span>)</div>
+                    <div id="membersList"></div>
+                </div>
+            </div>
+
+            <div class="dialog-buttons" style="margin-top: 20px;">
+                <button class="dialog-btn secondary" onclick="hideCollabDialog()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 快速加入协作对话框 -->
+    <div class="dialog-overlay" id="quickJoinDialog">
+        <div class="dialog-box">
+            <div class="dialog-title">加入协作清单</div>
+            <div style="padding: 20px;">
+                <div style="font-size: 14px; color: #666; margin-bottom: 12px;">输入6位邀请码</div>
+                <input type="text" class="dialog-input" id="quickJoinCode" placeholder="例如: ABC123" maxlength="6" style="text-transform: uppercase;">
+            </div>
+            <div class="dialog-buttons">
+                <button class="dialog-btn secondary" onclick="hideQuickJoinDialog()">取消</button>
+                <button class="dialog-btn primary" onclick="quickJoinCollab()">加入</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="weather.js"></script>
+    <script src="mobile.js"></script>
+</body>
+</html><style>
+        .join-collab-card {
+            margin: 0 20px 20px;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .join-collab-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+        }
+
+        .join-collab-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #a4ceb7, #cee9dc);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .join-collab-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .join-collab-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .join-collab-desc {
+            font-size: 13px;
+            color: #999;
+            line-height: 1.4;
+        }
+
+        .join-collab-arrow {
+        .weather-scroll-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .weather-scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .weather-cards {
+            display: flex;
+            gap: 12px;
+            padding: 4px 0;
+        }
+
+        .weather-card {
+            flex-shrink: 0;
+            width: 100px;
+            background: linear-gradient(135deg, #a4ceb7, #cee9dc);
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            color: white;
+        }
+
+        .weather-card-date {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .weather-card-icon {
+            font-size: 32px;
+            margin: 8px 0;
+        }
+
+        .weather-card-temp {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .weather-loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+            font-size: 28px;
+            color: #ddd;
+            font-weight: 300;
+        }
+</style>
