@@ -280,14 +280,19 @@ function openTrip(tripId) {
 
 // 渲染旅行信息（先显示估算，后台加载真实天气）
 async function renderTripInfo(trip) {
+    console.log('开始渲染天气，trip:', trip);
+    
     // 立即显示估算天气
     const estimatedWeather = getEstimatedWeather(trip.startDate, trip.endDate);
+    console.log('估算天气:', estimatedWeather);
     displayTripInfo(trip, estimatedWeather, true);
     
     // 后台加载真实天气
     if (!trip.weather) {
+        console.log('开始加载真实天气...');
         getWeather(trip.destination, trip.startDate, trip.endDate)
             .then(weather => {
+                console.log('真实天气加载成功:', weather);
                 saveWeatherToTrip(trip.id, weather);
                 displayTripInfo(trip, weather, false);
             })
@@ -296,22 +301,38 @@ async function renderTripInfo(trip) {
             });
     } else {
         // 使用缓存的天气
+        console.log('使用缓存天气:', trip.weather);
         displayTripInfo(trip, trip.weather, false);
     }
 }
 
 // 显示旅行信息
 function displayTripInfo(trip, weather, isEstimated) {
-    console.log('显示天气:', weather, 'days:', weather.days);
+    console.log('========== 显示天气 ==========');
+    console.log('weather对象:', weather);
+    console.log('weather.days:', weather.days);
+    console.log('days是数组吗?', Array.isArray(weather.days));
+    console.log('days长度:', weather.days?.length);
+    console.log('第一天数据:', weather.days?.[0]);
     
     const estimatedTag = isEstimated ? '<span style="font-size: 10px; color: #999;"> (估算)</span>' : '';
     
-    const weatherHtml = weather.days && weather.days.length > 0 ? weather.days.map(day => `
-        <div class="weather-day">
-            <span class="weather-day-date">${formatMonthDay(day.date)} ${day.icon}</span>
-            <span class="weather-day-temp">${day.tempMin}°-${day.tempMax}°</span>
-        </div>
-    `).join('') : `<div class="trip-info-temp">${weather.tempAvg}°${estimatedTag}</div>`;
+    let weatherHtml;
+    if (weather.days && Array.isArray(weather.days) && weather.days.length > 0) {
+        console.log('使用多天天气显示');
+        weatherHtml = weather.days.map(day => {
+            console.log('渲染日期:', day.date, day.tempMin, day.tempMax, day.icon);
+            return `
+                <div class="weather-day">
+                    <span class="weather-day-date">${formatMonthDay(day.date)} ${day.icon}</span>
+                    <span class="weather-day-temp">${day.tempMin}°-${day.tempMax}°</span>
+                </div>
+            `;
+        }).join('');
+    } else {
+        console.log('使用单温度显示');
+        weatherHtml = `<div class="trip-info-temp">${weather.tempAvg}°${estimatedTag}</div>`;
+    }
     
     const html = `
         <div class="trip-info-header">
